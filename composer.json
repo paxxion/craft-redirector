@@ -21,7 +21,7 @@
     }
   },
   "extra": {
-    "handle": "redirector",
+    "handle": "pxx-redirector",
     "name": "Redirector",
     "developer": "Paxxion",
     "documentationUrl": "https://github.com/paxxion/craft-redirector",
