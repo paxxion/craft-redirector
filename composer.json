@@ -1,6 +1,6 @@
 {
   "name": "paxxion/craft-redirector",
-  "description": "Redirector helps you redirect 404 urls to prevent SEO value loss",
+  "description": "Smart redirect management to preserve SEO integrity and site performance.",
   "type": "craft-plugin",
   "license": "proprietary",
   "support": {

@@ -1,38 +1,64 @@
 # Redirector
 
-### Really basic intro to SEO and redirects
+### A clear and practical introduction to redirects and SEO value 
 
-Imagine a pretty normal entry inside your Products section:  
+Imagine a standard product entry on your site:  
 `https://my-site.test/products/pretty-normal-entry`
 
-Your customer tells you to move to a different category and rename it:  
+Your client asks you to move it to another category and rename it, resulting in:  
 `https://my-site.test/products/awesome-entries/really-awesome-entry`
 
-Now, every link to your entry must change. If you’ve used a dynamic link, it’s all automatic and your links will be perfectly healthy. However, their links won’t.
+Every internal link will update automatically if you’ve used dynamic URLs, but **external links won’t**.
 
-### Wait, who’s they?
+### Why this matters
 
-They is every site which has a link to your **normal** entry, which is now obsolete. Crucially, one of them is the Google Search index which (still) drives most of the traffic to your site. This means that users searching for your entry will get a match on Google that will lead to a 404 page.
+Those external links include **other websites, bookmarked URLs saved in users’ browsers**, and, more importantly, **Google’s search index**, which still points to the old address. Users clicking those results will land on a **404 error page** and that’s bad for both experience and SEO. 
 
-### Brief digression: why is a 404 page bad?
-Firstly, a 404 (Not Found) page is quite unwelcoming to users and there’s a real danger that a potential customer could be led away from your store/service.
+### Why 404 pages can harm SEO
 
-Moreover, since you are swapping a real page with actual content for an error page, it will disrupt your SEO ranking, harming visibility and sales of your other entries. That is bad!
+A 404 (Not Found) page isn’t always bad as it’s a **normal and expected response** when a page truly doesn’t exist or has never existed. 
 
-In time, Google will realize that the old boring **normal** entry has become new and **awesome** and will update its index to take into account the new awesomeness. That will take a few days, maybe a week. Two weeks. Maybe more. It depends. Nobody really knows for sure. But you have an ally at your side.
+However, when a 404 replaces a page that **previously contained valuable content**, it creates two main problems:
+- users encounter a dead end instead of relevant information;
+- search engines detect lost content and remove the page from their index, leading to:
+    - **loss of PageRank and link equity** from inbound links,
+    - **drop in search visibility** for related pages,
+    - **delayed re-indexing** of the new URL.
 
-### Redirects!
+In such cases, using a proper redirect is the best way to preserve both user experience and SEO value. 
 
-Redirects are small messages (technically, “HTTP header”) that your site sends to the browser, saying “This normal entry has moved on, you can find the new one over there”. The browser will dutifully follow directions and it will take you to the **awesome entry**. Awesome! Redirects come in many flavors, but the most important are **permanent (301)** and **temporary (302)**. From the user’s point of view, 301s and 302s are identical, but a search engine will treat them very differently: **a 301 is a clear indication to the search engine that its index must be updated** and will greatly speed up the update process (how greatly? A few days. It depends. Nobody really knows for sure).
+### The role of redirects 
 
-### But URLs should never change, right?
-You are correct, but in this universe URLs change all the time. Products are rebranded, categories shuffled, and generally speaking if something “should never” happen that means it absolutely will. 
+A **redirect** is a small HTTP instruction your server sends to browsers and search engines, saying:  
+“This page has moved. You can find it here.”
 
-### Back to your plugin…
+The browser and search engine crawlers, such as Googlebot, follow that direction and reach the correct page automatically. 
 
-**Redirector** helps you manage and redirect 404 URLs to preserve SEO value, using either exact matches or RegEx pattern rules.
+There are several types of redirects, the most common being **301** and **302**:
+- **301 (Permanent)** tells search engines to update their index and transfer SEO value to the new URL. 
+- **302 (Temporary)** keeps the old URL indexed, used for short-term moves. 
 
-Redirects can be configured globally or per site. Also, they are automatically generated whenever an entry’s slug changes or its position within a Structure is updated.
+From a user’s perspective, both behave the same way — but from an SEO standpoint, **301 redirects** are essential to preserve rankings and link equity. 
+
+### But URLs shouldn’t change, right? 
+Ideally, yes, but in the real world they often do.  
+Products get rebranded or discontinued, categories are reorganized, and slugs evolve.  
+When that happens, having an automated redirect system is essential to maintain SEO integrity. 
+
+### Meet Redirector
+
+**Redirector** helps you easily manage redirects and preserve SEO value whenever URLs change.  
+It automatically handles redirects whenever an entry’s slug or its position within a Structure is updated, preventing 404 errors and protecting your site’s visibility.
+
+Redirector allows you to manage 404 errors by generating **301 permanent redirects**, but also supports **302**, **307**, and **308** redirect types for temporary or advanced use cases. 
+Additionally, it lets you assign a **410 Gone** status to 404 pages that should be permanently removed from your site, ensuring they are definitively excluded from search engine indexes.
+
+You can:
+- define exact-match or RegEx-based redirect rules;
+- configure redirects globally or per site;
+- monitor and manage all redirects through an intuitive interface. 
+
+Redirector automatically ensures that every moved, renamed, or deprecated entry maintains its SEO integrity, keeping your site structure clean and your rankings protected.
 
 ## Requirements
 
