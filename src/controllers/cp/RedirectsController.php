@@ -31,7 +31,7 @@ class RedirectsController extends Controller
 
         $returnSites = [
             'all' => [
-                'label' => Craft::t('redirector', 'All sites'),
+                'label' => Craft::t('pxx-redirector', 'All sites'),
                 'value' => '',
             ]
         ];
@@ -43,7 +43,7 @@ class RedirectsController extends Controller
             ];
         }
 
-        return $this->renderTemplate('redirector/cp/redirects/index', [
+        return $this->renderTemplate('pxx-redirector/cp/redirects/index', [
             'sites' => $returnSites,
         ]);
     }
@@ -103,7 +103,7 @@ class RedirectsController extends Controller
                 'id' => $redirectRow->id,
                 'uid' => $redirectRow->uid,
                 'enabled' => $redirectRow->enabled ? true : false,
-                'siteName' => $redirectRow->site->name ?? Craft::t('redirector', 'All sites'),
+                'siteName' => $redirectRow->site->name ?? Craft::t('pxx-redirector', 'All sites'),
                 'oldUrl' => $redirectRow->oldUrl,
                 'newUrl' => $redirectRow->newUrl,
                 'matchType' => $redirectRow->matchType,
@@ -245,7 +245,7 @@ class RedirectsController extends Controller
     {
         Craft::$app->getView()->registerAssetBundle(RedirectorAssets::class);
 
-        return $this->renderTemplate('redirector/cp/redirects/import', []);
+        return $this->renderTemplate('pxx-redirector/cp/redirects/import', []);
     }
 
     public function actionImportCsv():Response
@@ -260,14 +260,14 @@ class RedirectsController extends Controller
         if (!$uploadedFile) {
             Craft::$app->response->statusCode = 400;
             return $this->asJson([
-                'error' => Craft::t('redirector', 'Required'),
+                'error' => Craft::t('pxx-redirector', 'Required'),
             ]);
         }
 
         if (strtolower($uploadedFile->getExtension()) !== 'csv') {
             Craft::$app->response->statusCode = 400;
             return $this->asJson([
-                'error' => Craft::t('redirector', 'Upload a CSV file'),
+                'error' => Craft::t('pxx-redirector', 'Upload a CSV file'),
             ]);
         }
 
@@ -302,14 +302,14 @@ class RedirectsController extends Controller
                 if (!in_array('oldUrl', $headers)) {
                     Craft::$app->response->statusCode = 400;
                     return $this->asJson([
-                        'error' => Craft::t('redirector', 'Missing oldUrl column'),
+                        'error' => Craft::t('pxx-redirector', 'Missing oldUrl column'),
                     ]);
                 }
 
                 if (!in_array('newUrl', $headers)) {
                     Craft::$app->response->statusCode = 400;
                     return $this->asJson([
-                        'error' => Craft::t('redirector', 'Missing newUrl column'),
+                        'error' => Craft::t('pxx-redirector', 'Missing newUrl column'),
                     ]);
                 }
 
@@ -421,7 +421,7 @@ class RedirectsController extends Controller
 
         $returnSites = [
             'all' => [
-                'label' => Craft::t('redirector', 'All sites'),
+                'label' => Craft::t('pxx-redirector', 'All sites'),
                 'value' => '',
             ]
         ];
@@ -477,7 +477,7 @@ class RedirectsController extends Controller
             $errors[$key] = '';
         }
 
-        return $this->renderTemplate('redirector/cp/redirects/entry', [
+        return $this->renderTemplate('pxx-redirector/cp/redirects/entry', [
             'isNew' => $uid == 'new',
             'sites' => $returnSites,
             'data' => $redirectData,
@@ -493,11 +493,11 @@ class RedirectsController extends Controller
 
         // validation
         $validationRules = [
-            [ [ 'oldUrl', 'newUrl', 'matchType', 'httpCode' ], 'required', 'message' => Craft::t('redirector', 'Required field') ],
-            [ [ 'priority' ], 'required', 'when' => function ($model) { return $model->matchType === 'regex'; }, 'message' => Craft::t('redirector', 'Required field') ],
-            [ [ 'oldUrl', 'newUrl' ], 'match', 'pattern' => '/^https?:\/\//i', 'not' => true, 'message' => Craft::t('redirector', 'Only relative paths allowed') ],
+            [ [ 'oldUrl', 'newUrl', 'matchType', 'httpCode' ], 'required', 'message' => Craft::t('pxx-redirector', 'Required field') ],
+            [ [ 'priority' ], 'required', 'when' => function ($model) { return $model->matchType === 'regex'; }, 'message' => Craft::t('pxx-redirector', 'Required field') ],
+            [ [ 'oldUrl', 'newUrl' ], 'match', 'pattern' => '/^https?:\/\//i', 'not' => true, 'message' => Craft::t('pxx-redirector', 'Only relative paths allowed') ],
             [ [ 'newUrl' ], 'compare', 'compareAttribute' => 'oldUrl', 'operator' => '!=', 'message' => 'The new url cannot be equal to the old url' ],
-            [ [ 'httpCode', 'priority' ], 'integer', 'message' => Craft::t('redirector', 'Invalid format') ],
+            [ [ 'httpCode', 'priority' ], 'integer', 'message' => Craft::t('pxx-redirector', 'Invalid format') ],
             [ [ 'siteHandle', 'priority' ], 'default', 'value' => NULL ],
         ];
         $validate = DynamicModel::validateData($postData, $validationRules);

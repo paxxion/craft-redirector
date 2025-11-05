@@ -4,11 +4,11 @@
 
 {%
     set crumbs = [
-        { 'label': 'Redirector'|t('redirector'), 'url': url('redirector') },
-        { 'label': 'Settings'|t('redirector') },
+        { 'label': 'Redirector'|t('pxx-redirector'), 'url': url('pxx-redirector') },
+        { 'label': 'Settings'|t('pxx-redirector') },
     ]
 %}
-{% set title = 'Settings'|t('redirector') %}
+{% set title = 'Settings'|t('pxx-redirector') %}
 {% set selectedSubnavItem = 'settings' %}
 {% set fullPageForm = true %}
 
@@ -19,8 +19,8 @@
     <div class="flex-fields">
         {{
             forms.editableTableField({
-                label: 'Excluded 404'|t('redirector'),
-                instructions: 'Define 404 urls that must be excluded from Audit (these are exact matches after domain, ex. /favicon.ico)'|t('redirector'),
+                label: 'Excluded 404'|t('pxx-redirector'),
+                instructions: 'Define 404 urls that must be excluded from Audit (these are exact matches after domain, ex. /favicon.ico)'|t('pxx-redirector'),
                 id: 'excludedNotFound',
                 name: 'excludedNotFound',
                 required: false,
@@ -31,7 +31,7 @@
                 },
                 cols: {
                     path: {
-                        heading: 'Path'|t('redirector'),
+                        heading: 'Path'|t('pxx-redirector'),
                         type: "singleline",
                         width: "100%",
                         code: true,
@@ -43,8 +43,8 @@
         }}
         {{
             forms.editableTableField({
-                label: 'Excluded 404 Patterns'|t('redirector'),
-                instructions: 'Define patterns for 404 urls that must be excluded from Audit (regex tool https://regex101.com/)'|t('redirector'),
+                label: 'Excluded 404 Patterns'|t('pxx-redirector'),
+                instructions: 'Define patterns for 404 urls that must be excluded from Audit (regex tool https://regex101.com/)'|t('pxx-redirector'),
                 id: 'excludedNotFoundPatterns',
                 name: 'excludedNotFoundPatterns',
                 required: false,
@@ -55,7 +55,7 @@
                 },
                 cols: {
                     pattern: {
-                        heading: 'RegEx'|t('redirector'),
+                        heading: 'RegEx'|t('pxx-redirector'),
                         type: "singleline",
                         width: "100%",
                         code: true,

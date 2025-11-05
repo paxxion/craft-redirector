@@ -4,12 +4,12 @@
 
 {%
     set crumbs = [
-        { 'label': 'Redirector'|t('redirector'), 'url': url('redirector') },
-        { 'label': 'Redirects'|t('redirector'), 'url': url('redirector/redirects') },
-        { 'label': 'Import CSV'|t('redirector') },
+        { 'label': 'Redirector'|t('pxx-redirector'), 'url': url('pxx-redirector') },
+        { 'label': 'Redirects'|t('pxx-redirector'), 'url': url('redirector/redirects') },
+        { 'label': 'Import CSV'|t('pxx-redirector') },
     ]
 %}
-{% set title = 'Import CSV'|t('redirector') %}
+{% set title = 'Import CSV'|t('pxx-redirector') %}
 {% set selectedSubnavItem = 'redirects' %}
 {% set submitButtonLabel = 'Import CSV' %}
 {% set fullPageForm = false %}
@@ -17,7 +17,7 @@
 {% set actionButton %}
     <div x-cloak x-data="headerComponent">
         <button class="btn submit" @click="importCsv()">
-            {{ 'Import CSV'|t('redirector') }}
+            {{ 'Import CSV'|t('pxx-redirector') }}
         </button>
     </div>
 {% endset %}
@@ -28,7 +28,7 @@
             <div>
                 {{
                     forms.selectField({
-                        label: 'Separator'|t('redirector'),
+                        label: 'Separator'|t('pxx-redirector'),
                         name: 'separator',
                         options: {
                             comma: {
@@ -49,7 +49,7 @@
             <div class="tw:[&_.field]:mb-2!">                
                 {{
                     forms.fileField({
-                        label: 'CSV File'|t('redirector'),
+                        label: 'CSV File'|t('pxx-redirector'),
                         name: 'file',
                         inputAttributes: {
                             '@change': "handleFileSelect",
@@ -67,63 +67,63 @@
             </div>
         </div>
         <div class="pane">
-            <h3>{{ 'CSV requirements'|t('redirector') }}</h3>
-            <p>{{ 'The file must be a <strong>.csv</strong> file (comma or semicolon separated).<br>The first row must contain the columns headings that will be used to link the files\' columns to the databases\' columns.<br>A valid import file must contain at least the <strong>oldUrl</strong> and the <strong>newUrl</strong> columns. All other columns, if not available in the file, will fallback to their default values.'|t('redirector')|raw }}</h3></p>
+            <h3>{{ 'CSV requirements'|t('pxx-redirector') }}</h3>
+            <p>{{ 'The file must be a <strong>.csv</strong> file (comma or semicolon separated).<br>The first row must contain the columns headings that will be used to link the files\' columns to the databases\' columns.<br>A valid import file must contain at least the <strong>oldUrl</strong> and the <strong>newUrl</strong> columns. All other columns, if not available in the file, will fallback to their default values.'|t('pxx-redirector')|raw }}</h3></p>
             <table>
                 <thead>
-                    <th>{{ 'Column'|t('redirector') }}</th>
-                    <th>{{ 'Description'|t('redirector') }}</th>
-                    <th>{{ 'Requirement'|t('redirector') }}</th>
-                    <th>{{ 'Default'|t('redirector') }}</th>
-                    <th>{{ 'Valid Values'|t('redirector') }}</th>
+                    <th>{{ 'Column'|t('pxx-redirector') }}</th>
+                    <th>{{ 'Description'|t('pxx-redirector') }}</th>
+                    <th>{{ 'Requirement'|t('pxx-redirector') }}</th>
+                    <th>{{ 'Default'|t('pxx-redirector') }}</th>
+                    <th>{{ 'Valid Values'|t('pxx-redirector') }}</th>
                 </thead>
                 <tbody>
                     <tr>
                         <td>enabled</td>
-                        <td>{{ 'Enables/disables the redirect'|t('redirector') }}</td>
-                        <td>{{ 'Optional'|t('redirector') }}</td>
+                        <td>{{ 'Enables/disables the redirect'|t('pxx-redirector') }}</td>
+                        <td>{{ 'Optional'|t('pxx-redirector') }}</td>
                         <td><code>true</code></td>
                         <td><code>true</code>, <code>false</code>, <code>1</code>, <code>0</code></td>
                     </tr>
                     <tr>
                         <td>siteId</td>
-                        <td>{{ 'The site to which the redirect will apply to'|t('redirector') }}</td>
-                        <td>{{ 'Optional'|t('redirector') }}</td>
+                        <td>{{ 'The site to which the redirect will apply to'|t('pxx-redirector') }}</td>
+                        <td>{{ 'Optional'|t('pxx-redirector') }}</td>
                         <td>-</td>
                         <td></td>
                     </tr>
                     <tr>
                         <td>oldUrl</td>
-                        <td>{{ 'Old Url (absolute urls will be converted to relative paths)'|t('redirector') }}</td>
-                        <td>{{ 'Required'|t('redirector') }}</td>
+                        <td>{{ 'Old Url (absolute urls will be converted to relative paths)'|t('pxx-redirector') }}</td>
+                        <td>{{ 'Required'|t('pxx-redirector') }}</td>
                         <td></td>
                         <td></td>
                     </tr>
                     <tr>
                         <td>newUrl</td>
-                        <td>{{ 'New Url (absolute urls will be converted to relative paths)'|t('redirector') }}</td>
-                        <td>{{ 'Required'|t('redirector') }}</td>
+                        <td>{{ 'New Url (absolute urls will be converted to relative paths)'|t('pxx-redirector') }}</td>
+                        <td>{{ 'Required'|t('pxx-redirector') }}</td>
                         <td></td>
                         <td></td>
                     </tr>
                     <tr>
                         <td>matchType</td>
-                        <td>{{ 'The matching type for oldUrl column\'s value'|t('redirector') }}</td>
-                        <td>{{ 'Optional'|t('redirector') }}</td>
+                        <td>{{ 'The matching type for oldUrl column\'s value'|t('pxx-redirector') }}</td>
+                        <td>{{ 'Optional'|t('pxx-redirector') }}</td>
                         <td>exact</td>
                         <td>exact, regex</td>
                     </tr>
                     <tr>
                         <td>priority</td>
-                        <td>{{ 'Priority of the redirect rule (only for matchType regex)'|t('redirector') }}</td>
-                        <td>{{ 'Optional'|t('redirector') }}</td>
+                        <td>{{ 'Priority of the redirect rule (only for matchType regex)'|t('pxx-redirector') }}</td>
+                        <td>{{ 'Optional'|t('pxx-redirector') }}</td>
                         <td>-</td>
                         <td>10, 20, ...</td>
                     </tr>
                     <tr>
                         <td>httpCode</td>
-                        <td>{{ 'HTTP code that the redirect will send in the response'|t('redirector') }}</td>
-                        <td>{{ 'Optional'|t('redirector') }}</td>
+                        <td>{{ 'HTTP code that the redirect will send in the response'|t('pxx-redirector') }}</td>
+                        <td>{{ 'Optional'|t('pxx-redirector') }}</td>
                         <td>301</td>
                         <td>301, 302, 307, 308, 410</td>
                     </tr>
@@ -188,7 +188,7 @@
                                 self.error = errorData.error;
                             }
                             else {                                
-                                Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                                Craft.cp.displayError('{{ 'An error has occured!'|t('pxx-redirector') }}');
                             }
                         })
                         .finally(function() {

@@ -13,7 +13,7 @@ class UrlHistoryElement extends BaseUiElement
 {
     public function selectorLabel(): string
     {
-        return Craft::t('redirector', 'Url History');
+        return Craft::t('pxx-redirector', 'Url History');
     }
 
     public function formHtml(?ElementInterface $element = null, bool $static = false): ?string

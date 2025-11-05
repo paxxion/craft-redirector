@@ -22,7 +22,7 @@ class AuditController extends Controller
 
         $returnSites = [
             'all' => [
-                'label' => Craft::t('redirector', 'All sites'),
+                'label' => Craft::t('pxx-redirector', 'All sites'),
                 'value' => '',
             ]
         ];
@@ -34,7 +34,7 @@ class AuditController extends Controller
             ];
         }
 
-        return $this->renderTemplate('redirector/cp/audit/index', [
+        return $this->renderTemplate('pxx-redirector/cp/audit/index', [
             'sites' => $returnSites,
         ]);
     }

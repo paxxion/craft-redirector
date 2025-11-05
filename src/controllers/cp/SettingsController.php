@@ -13,7 +13,7 @@ class SettingsController extends Controller
     
     public function actionIndex():Response
     {
-        return $this->renderTemplate('redirector/cp/settings/settings', [
+        return $this->renderTemplate('pxx-redirector/cp/settings/settings', [
             'settings' => Redirector::getInstance()->getSettings(),
         ]);
     }

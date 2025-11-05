@@ -97,25 +97,25 @@ class Redirector extends Plugin
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function(RegisterUrlRulesEvent $event) {
                 // index
-                $event->rules['redirector'] = [ 'route' => 'redirector/cp/redirects/redirect-to-index'];
+                $event->rules['redirector'] = [ 'route' => 'pxx-redirector/cp/redirects/redirect-to-index'];
                 // audit index
-                $event->rules['redirector/audit'] = [ 'route' => 'redirector/cp/audit/index'];
-                $event->rules['redirector/audit/get-rows'] = [ 'route' => 'redirector/cp/audit/get-rows'];
-                $event->rules['redirector/audit/delete-rows'] = [ 'route' => 'redirector/cp/audit/delete-rows'];
-                $event->rules['redirector/audit/export-csv'] = [ 'route' => 'redirector/cp/audit/export-csv'];
+                $event->rules['redirector/audit'] = [ 'route' => 'pxx-redirector/cp/audit/index'];
+                $event->rules['redirector/audit/get-rows'] = [ 'route' => 'pxx-redirector/cp/audit/get-rows'];
+                $event->rules['redirector/audit/delete-rows'] = [ 'route' => 'pxx-redirector/cp/audit/delete-rows'];
+                $event->rules['redirector/audit/export-csv'] = [ 'route' => 'pxx-redirector/cp/audit/export-csv'];
                 // redirects index
-                $event->rules['redirector/redirects'] = [ 'route' => 'redirector/cp/redirects/index'];
-                $event->rules['redirector/redirects/get-rows'] = [ 'route' => 'redirector/cp/redirects/get-rows'];
-                $event->rules['redirector/redirects/update-rows'] = [ 'route' => 'redirector/cp/redirects/update-rows'];
-                $event->rules['redirector/redirects/delete-rows'] = [ 'route' => 'redirector/cp/redirects/delete-rows'];
-                $event->rules['redirector/redirects/export-csv'] = [ 'route' => 'redirector/cp/redirects/export-csv'];
-                $event->rules['redirector/redirects/import'] = [ 'route' => 'redirector/cp/redirects/import'];
-                $event->rules['redirector/redirects/import-csv'] = [ 'route' => 'redirector/cp/redirects/import-csv'];
+                $event->rules['redirector/redirects'] = [ 'route' => 'pxx-redirector/cp/redirects/index'];
+                $event->rules['redirector/redirects/get-rows'] = [ 'route' => 'pxx-redirector/cp/redirects/get-rows'];
+                $event->rules['redirector/redirects/update-rows'] = [ 'route' => 'pxx-redirector/cp/redirects/update-rows'];
+                $event->rules['redirector/redirects/delete-rows'] = [ 'route' => 'pxx-redirector/cp/redirects/delete-rows'];
+                $event->rules['redirector/redirects/export-csv'] = [ 'route' => 'pxx-redirector/cp/redirects/export-csv'];
+                $event->rules['redirector/redirects/import'] = [ 'route' => 'pxx-redirector/cp/redirects/import'];
+                $event->rules['redirector/redirects/import-csv'] = [ 'route' => 'pxx-redirector/cp/redirects/import-csv'];
                 // redirects entry (DO NOT CHANGE ORDER)
-                $event->rules['redirector/redirects/save-redirect'] = [ 'route' => 'redirector/cp/redirects/save-redirect'];
-                $event->rules['redirector/redirects/<uid:.+>'] = [ 'route' => 'redirector/cp/redirects/entry'];
+                $event->rules['redirector/redirects/save-redirect'] = [ 'route' => 'pxx-redirector/cp/redirects/save-redirect'];
+                $event->rules['redirector/redirects/<uid:.+>'] = [ 'route' => 'pxx-redirector/cp/redirects/entry'];
                 // settings
-                $event->rules['redirector/settings'] = [ 'route' => 'redirector/cp/settings/index'];
+                $event->rules['redirector/settings'] = [ 'route' => 'pxx-redirector/cp/settings/index'];
             }
         );
         
@@ -130,21 +130,21 @@ class Redirector extends Plugin
 
                 $event->navItems = array_merge($event->navItems, [
                     [
-                        'label' => Craft::t('redirector', 'Redirector'),
+                        'label' => Craft::t('pxx-redirector', 'Redirector'),
                         'url' => 'redirector',
                         'icon' => '@paxxion/craftredirector/icon-mask.svg',
                         'subnav' => [
                             'audit' => [
-                                'label' => Craft::t('redirector', 'Audit'),
+                                'label' => Craft::t('pxx-redirector', 'Audit'),
                                 'url' => 'redirector/audit',
                                 'badgeCount' => AuditService::getNotHandledCount(),
                             ],
                             'redirects' => [
-                                'label' => Craft::t('redirector', 'Redirects'),
+                                'label' => Craft::t('pxx-redirector', 'Redirects'),
                                 'url' => 'redirector/redirects',
                             ],
                             'settings' => [
-                                'label' => Craft::t('redirector', 'Settings'),
+                                'label' => Craft::t('pxx-redirector', 'Settings'),
                                 'url' => 'redirector/settings',
                             ]
                         ],
@@ -158,10 +158,10 @@ class Redirector extends Plugin
             UserPermissions::EVENT_REGISTER_PERMISSIONS,
             function(RegisterUserPermissionsEvent $event) {
                 $event->permissions[] = [
-                    'heading' => Craft::t('redirector', 'Redirector'),
+                    'heading' => Craft::t('pxx-redirector', 'Redirector'),
                     'permissions' => [
                         'accessPlugin-redirector' => [
-                            'label' => Craft::t('redirector', 'Enable'),
+                            'label' => Craft::t('pxx-redirector', 'Enable'),
                         ],
                     ],
                 ];

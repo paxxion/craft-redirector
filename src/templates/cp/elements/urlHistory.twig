@@ -2,9 +2,9 @@
     {% if rows %}
         <table class="data fullwidth">
             <thead>
-                <th>{{ 'From'|t('redirector') }}</th>
-                <th>{{ 'To'|t('redirector') }}</th>
-                <th>{{ 'Url'|t('redirector') }}</th>
+                <th>{{ 'From'|t('pxx-redirector') }}</th>
+                <th>{{ 'To'|t('pxx-redirector') }}</th>
+                <th>{{ 'Url'|t('pxx-redirector') }}</th>
             </thead>
             <tbody>
                 {% for row in rows %}
@@ -19,6 +19,6 @@
             </tbody>
         </table>
     {% else %}
-        {{ 'No entries'|t('redirector') }}
+        {{ 'No entries'|t('pxx-redirector') }}
     {% endif %}
 </div>

@@ -4,23 +4,23 @@
 
 {%
     set crumbs = [
-        { 'label': 'Redirector'|t('redirector'), 'url': url('redirector') },
-        { 'label': 'Redirects'|t('redirector') },
+        { 'label': 'Redirector'|t('pxx-redirector'), 'url': url('pxx-redirector') },
+        { 'label': 'Redirects'|t('pxx-redirector') },
     ]
 %}
-{% set title = 'Redirects'|t('redirector') %}
+{% set title = 'Redirects'|t('pxx-redirector') %}
 {% set selectedSubnavItem = 'redirects' %}
 {% set fullPageForm = false %}
 {% set actionButton %}
     <div x-cloak x-data="headerComponent">
         <button class="btn" @click="exportCsv()">
-            {{ 'Export CSV'|t('redirector') }}
+            {{ 'Export CSV'|t('pxx-redirector') }}
         </button>
     </div>
     <a href="{{ cpUrl('redirector/redirects/import') }}" class="btn">
-        {{ 'Import CSV'|t('redirector') }}
+        {{ 'Import CSV'|t('pxx-redirector') }}
     </a>
-    <a class="btn submit add icon" href="{{ cpUrl('redirector/redirects/new')|split('?')|first }}">{{ 'New Redirect'|t('redirector') }}</a>
+    <a class="btn submit add icon" href="{{ cpUrl('redirector/redirects/new')|split('?')|first }}">{{ 'New Redirect'|t('pxx-redirector') }}</a>
 {% endset %}
 
 {% block content %}
@@ -39,14 +39,14 @@
             <div x-cloak x-show="totalDataRowsSelected">
                 <div class="select">
                     <select x-model="bulkAction" @change="handleBulkAction()">
-                        <option value="" x-text="'{{ 'Selected'|t('redirector') }} (' + totalDataRowsSelected + ')'"></option>
-                        <option value="setHttpCode-301">{{ 'Set status 301'|t('redirector') }}</option>
-                        <option value="setHttpCode-302">{{ 'Set status 302'|t('redirector') }}</option>
-                        <option value="setHttpCode-307">{{ 'Set status 307'|t('redirector') }}</option>
-                        <option value="setHttpCode-410">{{ 'Set status 410'|t('redirector') }}</option>
-                        <option value="setStatus-enabled">{{ 'Enable'|t('redirector') }}</option>
-                        <option value="setStatus-disabled">{{ 'Disable'|t('redirector') }}</option>
-                        <option value="delete">{{ 'Delete'|t('redirector') }}</option>
+                        <option value="" x-text="'{{ 'Selected'|t('pxx-redirector') }} (' + totalDataRowsSelected + ')'"></option>
+                        <option value="setHttpCode-301">{{ 'Set status 301'|t('pxx-redirector') }}</option>
+                        <option value="setHttpCode-302">{{ 'Set status 302'|t('pxx-redirector') }}</option>
+                        <option value="setHttpCode-307">{{ 'Set status 307'|t('pxx-redirector') }}</option>
+                        <option value="setHttpCode-410">{{ 'Set status 410'|t('pxx-redirector') }}</option>
+                        <option value="setStatus-enabled">{{ 'Enable'|t('pxx-redirector') }}</option>
+                        <option value="setStatus-disabled">{{ 'Disable'|t('pxx-redirector') }}</option>
+                        <option value="delete">{{ 'Delete'|t('pxx-redirector') }}</option>
                     </select>
                 </div>
             </div>
@@ -60,7 +60,7 @@
             </div>
             {# page items #}
             <div class="tw:ml-auto tw:flex tw:items-center tw:gap-x-2">
-                <div class="">{{ 'Items per page'|t('redirector') }}</div>
+                <div class="">{{ 'Items per page'|t('pxx-redirector') }}</div>
                 <div class="select">
                     <select x-model="data.pageItems" :disabled="busy" @change="pageItemsChange()">                        
                         <option value="50">50</option>
@@ -77,19 +77,19 @@
                 <div class="tw:grow">
                     {{
                         forms.selectField({
-                            label: 'Enabled'|t('redirector'),
+                            label: 'Enabled'|t('pxx-redirector'),
                             name: 'enabled',
                             options: {
                                 all: {
-                                    label: 'All'|t('redirector'),
+                                    label: 'All'|t('pxx-redirector'),
                                     value: '',
                                 },
                                 yes: {
-                                    label: 'Yes'|t('redirector'),
+                                    label: 'Yes'|t('pxx-redirector'),
                                     value: 'yes',
                                 },
                                 No: {
-                                    label: 'No'|t('redirector'),
+                                    label: 'No'|t('pxx-redirector'),
                                     value: 'no',
                                 },
                             },
@@ -103,7 +103,7 @@
                 <div class="tw:grow">
                     {{
                         forms.textField({
-                            label: 'Redirect From'|t('redirector'),
+                            label: 'Redirect From'|t('pxx-redirector'),
                             name: 'oldUrl',
                             inputAttributes: {
                                 'x-model': 'data.filters.oldUrl',
@@ -115,7 +115,7 @@
                 <div class="tw:grow">
                     {{
                         forms.textField({
-                            label: 'Redirect To'|t('redirector'),
+                            label: 'Redirect To'|t('pxx-redirector'),
                             name: 'newUrl',
                             inputAttributes: {
                                 'x-model': 'data.filters.newUrl',
@@ -127,7 +127,7 @@
                 <div class="tw:grow">
                     {{
                         forms.selectField({
-                            label: 'Site'|t('redirector'),
+                            label: 'Site'|t('pxx-redirector'),
                             name: 'site',
                             options: sites,
                             inputAttributes: {
@@ -140,19 +140,19 @@
                 <div class="tw:grow">
                     {{
                         forms.selectField({
-                            label: 'Match Type'|t('redirector'),
+                            label: 'Match Type'|t('pxx-redirector'),
                             name: 'matchType',
                             options: {
                                 all: {
-                                    label: 'All'|t('redirector'),
+                                    label: 'All'|t('pxx-redirector'),
                                     value: '',
                                 },
                                 exact: {
-                                    label: 'Exact Match'|t('redirector'),
+                                    label: 'Exact Match'|t('pxx-redirector'),
                                     value: 'exact',
                                 },
                                 regex: {
-                                    label: 'RegEx Match'|t('redirector'),
+                                    label: 'RegEx Match'|t('pxx-redirector'),
                                     value: 'regex',
                                 },
                             },
@@ -166,12 +166,12 @@
                 <div class="tw:grow">
                     {{
                         forms.selectField({
-                            label: 'Redirect Type'|t('redirector'),
+                            label: 'Redirect Type'|t('pxx-redirector'),
                             fieldClass: '',
                             name: 'httpCode',
                             options: {
                                 all: {
-                                    label: 'Select'|t('redirector'),
+                                    label: 'Select'|t('pxx-redirector'),
                                     value: '',
                                 },
                                 301: {
@@ -202,7 +202,7 @@
                 <div class="tw:grow">
                     {{
                         forms.textField({
-                            label: 'Date From'|t('redirector'),
+                            label: 'Date From'|t('pxx-redirector'),
                             name: 'dateFrom',
                             inputAttributes: {
                                 'type': 'date',
@@ -215,7 +215,7 @@
                 <div class="tw:grow">
                     {{
                         forms.textField({
-                            label: 'Date To'|t('redirector'),
+                            label: 'Date To'|t('pxx-redirector'),
                             name: 'dateTo',
                             inputAttributes: {
                                 'type': 'date',
@@ -227,10 +227,10 @@
             </div>
             <div class="tw:flex tw:justify-center tw:gap-x-4">
                 <button class="btn" @click="applyFilters()">
-                    {{ 'Apply filters'|t('redirector') }}
+                    {{ 'Apply filters'|t('pxx-redirector') }}
                 </button>
                 <button class="btn" :disabled="!anyFiltersApplied" :class="{ 'tw:opacity-50 tw:pointer-events-none': !anyFiltersApplied }" @click="resetFilters()">
-                    {{ 'Reset filters'|t('redirector') }}
+                    {{ 'Reset filters'|t('pxx-redirector') }}
                 </button>
             </div>
         </div>
@@ -258,7 +258,7 @@
                         </th>                        
                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'oldUrl' }" @click="setSort('oldUrl')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Redirect From'|t('redirector') }}</span>
+                                <span>{{ 'Redirect From'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'oldUrl'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -271,7 +271,7 @@
                         </th>
                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'newUrl' }" @click="setSort('newUrl')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Redirect To'|t('redirector') }}</span>
+                                <span>{{ 'Redirect To'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'newUrl'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -284,7 +284,7 @@
                         </th>
                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'sites.name' }" @click="setSort('sites.name')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Site'|t('redirector') }}</span>
+                                <span>{{ 'Site'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'sites.name'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -297,7 +297,7 @@
                         </th>
                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'matchType' }" @click="setSort('matchType')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Match Type'|t('redirector') }}</span>
+                                <span>{{ 'Match Type'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'matchType'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -310,7 +310,7 @@
                         </th>
                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'priority' }" @click="setSort('priority')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Priority'|t('redirector') }}</span>
+                                <span>{{ 'Priority'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'priority'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -323,7 +323,7 @@
                         </th>
                          <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'httpCode' }" @click="setSort('httpCode')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'HTTP Code'|t('redirector') }}</span>
+                                <span>{{ 'HTTP Code'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'httpCode'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -336,7 +336,7 @@
                         </th>
                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'totalHits' }" @click="setSort('totalHits')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Total Hits'|t('redirector') }}</span>
+                                <span>{{ 'Total Hits'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'totalHits'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -349,7 +349,7 @@
                         </th>
                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'dateLastHit' }" @click="setSort('dateLastHit')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Last Hit'|t('redirector') }}</span>
+                                <span>{{ 'Last Hit'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'dateLastHit'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -362,7 +362,7 @@
                         </th>
                         <th>
                            <div class="tw:flex tw:justify-between tw:items-center tw:w-fit tw:mx-auto">
-                                <span>{{ 'Actions'|t('redirector') }}</span>
+                                <span>{{ 'Actions'|t('pxx-redirector') }}</span>
                             </div>
                         </th>
                     </thead>
@@ -420,7 +420,7 @@
                         <div class="tw:flex tw:items-center tw:flex-column tw:flex-wrap tw:md:flex-row tw:justify-between tw:pt-4">
                             <span class="tw:text-sm tw:font-normal tw:text-gray-500 tw:mb-4 tw:md:mb-0 tw:block tw:w-full tw:md:inline tw:md:w-auto">
                                 <span class="tw:font-semibold tw:text-gray-900" x-text="pagination.rowsFrom + '-' + pagination.rowsTo">1-10</span>
-                                <span>{{ 'of'|t('redirector') }}</span>
+                                <span>{{ 'of'|t('pxx-redirector') }}</span>
                                 <span class="tw:font-semibold tw:text-gray-900" x-text="pagination.totalRows"></span>
                             </span>
                             <div x-show="pagination.pages > 1" class="tw:flex tw:text-sm tw:p-1">
@@ -446,7 +446,7 @@
                 {# no rows #}
                 <template x-if="(dataRows == null && !initializing) || (dataRows && dataRows.length == 0)">
                     <div class="tw:text-center tw:py-4 tw:font-bold">
-                        {{ 'No entries'|t('redirector') }}
+                        {{ 'No entries'|t('pxx-redirector') }}
                     </div>
                 </template>
             </div>
@@ -524,7 +524,7 @@
                         .catch(function(error) {
                             let responseData = error.response.data;
 
-                            Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('pxx-redirector') }}');
                         })
                         .finally(function() {
                             self.initializing = false;
@@ -551,7 +551,7 @@
                         .catch(function(error) {
                             let responseData = error.response.data;
 
-                            Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('pxx-redirector') }}');
                         })
                         .finally(function() {
                             self.initializing = false;
@@ -585,7 +585,7 @@
 
                     if (self.busy) return;
 
-                    if (window.confirm('{{ 'Delete row?'|t('redirector') }}')) {
+                    if (window.confirm('{{ 'Delete row?'|t('pxx-redirector') }}')) {
                         self.deleteDataRows([ id ]);
                     }
                 },
@@ -605,12 +605,12 @@
                             self.busy = false;
                             self.loadDataRows();
 
-                            Craft.cp.displaySuccess('{{ 'Update completed!'|t('redirector') }}');
+                            Craft.cp.displaySuccess('{{ 'Update completed!'|t('pxx-redirector') }}');
                         })
                         .catch(function(error) {
                             let responseData = error.response.data;
 
-                            Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('pxx-redirector') }}');
                         })
                         .finally(function() {
                             self.busy = false;
@@ -634,12 +634,12 @@
                             self.busy = false;
                             self.loadDataRows();
 
-                            Craft.cp.displaySuccess('{{ 'Deletion completed!'|t('redirector') }}');
+                            Craft.cp.displaySuccess('{{ 'Deletion completed!'|t('pxx-redirector') }}');
                         })
                         .catch(function(error) {
                             let responseData = error.response.data;
 
-                            Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('pxx-redirector') }}');
                         })
                         .finally(function() {
                             self.busy = false;
@@ -676,7 +676,7 @@
 
                     if (self.bulkAction.startsWith('setHttpCode')) {
                         let httpCode = self.bulkAction.split('-')[1];
-                        if (window.confirm(('{{ 'Update selected rows http code to ##code##?'|t('redirector') }}').replace('##code##', httpCode))) {
+                        if (window.confirm(('{{ 'Update selected rows http code to ##code##?'|t('pxx-redirector') }}').replace('##code##', httpCode))) {
                             self.updateDataRows(selectedRows, { httpCode: httpCode });
                         }
                     }
@@ -684,14 +684,14 @@
                     if (self.bulkAction.startsWith('setStatus')) {
                         let status = self.bulkAction.split('-')[1];
                         let label = status == 'enabled'
-                            ? '{{ 'Enabled'|t('redirector') }}'
-                            : '{{ 'Disabled'|t('redirector') }}';
-                        if (window.confirm(('{{ 'Update selected rows status to ##status##?'|t('redirector') }}').replace('##status##', label))) {
+                            ? '{{ 'Enabled'|t('pxx-redirector') }}'
+                            : '{{ 'Disabled'|t('pxx-redirector') }}';
+                        if (window.confirm(('{{ 'Update selected rows status to ##status##?'|t('pxx-redirector') }}').replace('##status##', label))) {
                             self.updateDataRows(selectedRows, { status: status });
                         }
                     }
 
-                    if (self.bulkAction == 'delete' && window.confirm('{{ 'Delete selected rows?'|t('redirector') }}')) {
+                    if (self.bulkAction == 'delete' && window.confirm('{{ 'Delete selected rows?'|t('pxx-redirector') }}')) {
                         self.deleteDataRows(selectedRows);
                     }
 

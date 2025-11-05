@@ -4,18 +4,18 @@
 
 {%
     set crumbs = [
-        { 'label': 'Redirector'|t('redirector'), 'url': url('redirector') },
-        { 'label': 'Audit'|t('redirector') },
+        { 'label': 'Redirector'|t('pxx-redirector'), 'url': url('pxx-redirector') },
+        { 'label': 'Audit'|t('pxx-redirector') },
     ]
 %}
-{% set title = 'Audit'|t('redirector') %}
+{% set title = 'Audit'|t('pxx-redirector') %}
 {% set selectedSubnavItem = 'audit' %}
 {% set fullPageForm = false %}
 
 {% set actionButton %}
     <div x-cloak x-data="headerComponent">
         <button class="btn" @click="exportCsv()">
-            {{ 'Export CSV'|t('redirector') }}
+            {{ 'Export CSV'|t('pxx-redirector') }}
         </button>
     </div>
 {% endset %}
@@ -36,8 +36,8 @@
             <div x-cloak x-show="totalDataRowsSelected">
                 <div class="select">
                     <select x-model="bulkAction" @change="handleBulkAction()">
-                        <option value="" x-text="'{{ 'Selected'|t('redirector') }} (' + totalDataRowsSelected + ')'"></option>
-                        <option value="delete">{{ 'Delete'|t('redirector') }}</option>
+                        <option value="" x-text="'{{ 'Selected'|t('pxx-redirector') }} (' + totalDataRowsSelected + ')'"></option>
+                        <option value="delete">{{ 'Delete'|t('pxx-redirector') }}</option>
                     </select>
                 </div>
             </div>
@@ -51,7 +51,7 @@
             </div>
             {# page items #}
             <div class="tw:ml-auto tw:flex tw:items-center tw:gap-x-2">
-                <div class="">{{ 'Items per page'|t('redirector') }}</div>
+                <div class="">{{ 'Items per page'|t('pxx-redirector') }}</div>
                 <div class="select">
                     <select x-model="data.pageItems" :disabled="busy" @change="pageItemsChange()">                        
                         <option value="50">50</option>
@@ -68,7 +68,7 @@
                 <div class="tw:grow">
                     {{
                         forms.selectField({
-                            label: 'Site'|t('redirector'),
+                            label: 'Site'|t('pxx-redirector'),
                             name: 'site',
                             options: sites,
                             inputAttributes: {
@@ -81,7 +81,7 @@
                 <div class="tw:grow">
                     {{
                         forms.textField({
-                            label: 'Url'|t('redirector'),
+                            label: 'Url'|t('pxx-redirector'),
                             name: 'url',
                             inputAttributes: {
                                 'x-model': 'data.filters.url',
@@ -93,7 +93,7 @@
                 <div class="tw:grow">
                     {{
                         forms.textField({
-                            label: 'Last Referrer'|t('redirector'),
+                            label: 'Last Referrer'|t('pxx-redirector'),
                             name: 'referrer',
                             inputAttributes: {
                                 'x-model': 'data.filters.referrer',
@@ -105,19 +105,19 @@
                 <div class="tw:grow">
                     {{
                         forms.selectField({
-                            label: 'Handled'|t('redirector'),
+                            label: 'Handled'|t('pxx-redirector'),
                             name: 'handled',
                             options: {
                                 all: {
-                                    label: 'All'|t('redirector'),
+                                    label: 'All'|t('pxx-redirector'),
                                     value: '',
                                 },
                                 yes: {
-                                    label: 'Yes'|t('redirector'),
+                                    label: 'Yes'|t('pxx-redirector'),
                                     value: 'yes',
                                 },
                                 No: {
-                                    label: 'No'|t('redirector'),
+                                    label: 'No'|t('pxx-redirector'),
                                     value: 'no',
                                 },
                             },
@@ -131,7 +131,7 @@
                 <div class="tw:grow">
                     {{
                         forms.textField({
-                            label: 'Date From'|t('redirector'),
+                            label: 'Date From'|t('pxx-redirector'),
                             name: 'dateFrom',
                             inputAttributes: {
                                 'type': 'date',
@@ -144,7 +144,7 @@
                 <div class="tw:grow">
                     {{
                         forms.textField({
-                            label: 'Date To'|t('redirector'),
+                            label: 'Date To'|t('pxx-redirector'),
                             name: 'dateTo',
                             inputAttributes: {
                                 'type': 'date',
@@ -156,10 +156,10 @@
             </div>
             <div class="tw:flex tw:justify-center tw:gap-x-4">
                 <button class="btn" @click="applyFilters()">
-                    {{ 'Apply filters'|t('redirector') }}
+                    {{ 'Apply filters'|t('pxx-redirector') }}
                 </button>
                 <button class="btn" :disabled="!anyFiltersApplied" :class="{ 'tw:opacity-50 tw:pointer-events-none': !anyFiltersApplied }" @click="resetFilters()">
-                    {{ 'Reset filters'|t('redirector') }}
+                    {{ 'Reset filters'|t('pxx-redirector') }}
                 </button>
             </div>
         </div>
@@ -187,7 +187,7 @@
                         </th>
                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'sites.name' }" @click="setSort('sites.name')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Site'|t('redirector') }}</span>
+                                <span>{{ 'Site'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'sites.name'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -200,7 +200,7 @@
                         </th>
                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'url' }" @click="setSort('url')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Url'|t('redirector') }}</span>
+                                <span>{{ 'Url'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'url'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -213,7 +213,7 @@
                         </th>
                         <th class="tw:cursor-pointer! tw:max-2xl:hidden" :class="{ 'tw:bg-selection-light!': data.sortField == 'lastReferrer' }" @click="setSort('lastReferrer')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Last Referrer'|t('redirector') }}</span>
+                                <span>{{ 'Last Referrer'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'lastReferrer'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -226,7 +226,7 @@
                         </th>
                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'totalHits' }" @click="setSort('totalHits')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Total Hits'|t('redirector') }}</span>
+                                <span>{{ 'Total Hits'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'totalHits'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -239,7 +239,7 @@
                         </th>
                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'dateLastHit' }" @click="setSort('dateLastHit')">
                             <div class="tw:flex tw:justify-between tw:items-center">
-                                <span>{{ 'Last Hit'|t('redirector') }}</span>
+                                <span>{{ 'Last Hit'|t('pxx-redirector') }}</span>
                                 <div x-show="data.sortField == 'dateLastHit'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
                                     <div x-show="data.sortDirection == 'asc'">
                                         {{ svg('@app/icons/solid/angle-up.svg') }}
@@ -252,12 +252,12 @@
                         </th>
                         <th>
                             <div class="tw:flex tw:justify-between tw:items-center tw:w-fit tw:mx-auto">
-                                <span>{{ 'Handled'|t('redirector') }}</span>
+                                <span>{{ 'Handled'|t('pxx-redirector') }}</span>
                             </div>
                         </th>
                         <th>
                             <div class="tw:flex tw:justify-between tw:items-center tw:w-fit tw:mx-auto">
-                                <span>{{ 'Actions'|t('redirector') }}</span>
+                                <span>{{ 'Actions'|t('pxx-redirector') }}</span>
                             </div>
                         </th>
                     </thead>
@@ -315,7 +315,7 @@
                                     <td class="tw:w-24">
                                         <template x-if="!dataRow.handled">
                                             <div class="tw:flex tw:justify-center tw:gap-x-4">
-                                                <a :href="'{{ cpUrl('redirector/redirects/new')|split('?')|first }}?uid=' + dataRow.uid" class="tw:hover:opacity-75 tw:transition-opacity" title="{{ 'Create redirect'|t('redirector') }}">
+                                                <a :href="'{{ cpUrl('redirector/redirects/new')|split('?')|first }}?uid=' + dataRow.uid" class="tw:hover:opacity-75 tw:transition-opacity" title="{{ 'Create redirect'|t('pxx-redirector') }}">
                                                     {{ svg('@app/icons/solid/plus.svg')|attr({ 'class': 'tw:w-5 tw:h-5 tw:fill-blue-500' }) }}
                                                 </a>
                                             </div>
@@ -332,7 +332,7 @@
                         <div class="tw:flex tw:items-center tw:flex-column tw:flex-wrap tw:md:flex-row tw:justify-between tw:pt-4">
                             <span class="tw:text-sm tw:font-normal tw:text-gray-500 tw:mb-4 tw:md:mb-0 tw:block tw:w-full tw:md:inline tw:md:w-auto">
                                 <span class="tw:font-semibold tw:text-gray-900" x-text="pagination.rowsFrom + '-' + pagination.rowsTo">1-10</span>
-                                <span>{{ 'of'|t('redirector') }}</span>
+                                <span>{{ 'of'|t('pxx-redirector') }}</span>
                                 <span class="tw:font-semibold tw:text-gray-900" x-text="pagination.totalRows"></span>
                             </span>
                             <div x-show="pagination.pages > 1" class="tw:flex tw:text-sm tw:p-1">
@@ -358,7 +358,7 @@
                 {# no rows #}
                 <template x-if="(dataRows == null && !initializing) || (dataRows && dataRows.length == 0)">
                     <div class="tw:text-center tw:py-4 tw:font-bold">
-                        {{ 'No entries'|t('redirector') }}
+                        {{ 'No entries'|t('pxx-redirector') }}
                     </div>
                 </template>
             </div>
@@ -434,7 +434,7 @@
                         .catch(function(error) {
                             let responseData = error.response.data;
 
-                            Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('pxx-redirector') }}');
                         })
                         .finally(function() {
                             self.initializing = false;
@@ -461,7 +461,7 @@
                         .catch(function(error) {
                             let responseData = error.response.data;
 
-                            Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('pxx-redirector') }}');
                         })
                         .finally(function() {
                             self.initializing = false;
@@ -508,12 +508,12 @@
                             self.busy = false;
                             self.loadDataRows();
 
-                            Craft.cp.displaySuccess('{{ 'Deletion completed!'|t('redirector') }}');
+                            Craft.cp.displaySuccess('{{ 'Deletion completed!'|t('pxx-redirector') }}');
                         })
                         .catch(function(error) {
                             let responseData = error.response.data;
 
-                            Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('pxx-redirector') }}');
                         })
                         .finally(function() {
                             self.busy = false;
@@ -539,7 +539,7 @@
 
                     if (self.busy) return;
 
-                    if (self.bulkAction == 'delete' && window.confirm('{{ 'Delete selected rows?'|t('redirector') }}')) {
+                    if (self.bulkAction == 'delete' && window.confirm('{{ 'Delete selected rows?'|t('pxx-redirector') }}')) {
                         let rowsToDelete = _.chain(self.dataRows)
                             .filter(function(dataRow) {
                                 return dataRow.selected;
