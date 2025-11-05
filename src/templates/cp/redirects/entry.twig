@@ -1,0 +1,267 @@
+{% extends "_layouts/cp" %}
+
+{% import '_includes/forms.twig' as forms %}
+
+{%
+    set crumbs = [
+        { 'label': 'Redirector'|t('redirector'), 'url': url('redirector') },
+        { 'label': 'Redirects'|t('redirector'), 'url': url('redirector/redirects') },
+        { 'label': isNew ? 'New Redirect'|t('redirector') : 'Editing Redirect'|t('redirector') },
+    ]
+%}
+{% set title = isNew ? 'New Redirect'|t('redirector') : 'Editing Redirect'|t('redirector') %}
+{% set selectedSubnavItem = 'redirects' %}
+{% set fullPageForm = false %}
+{% set actionButton %}
+    <div x-cloak x-data="headerComponent">
+        <button class="btn submit" @click="save(true)">
+            {{ 'Save'|t('redirector') }}
+        </button>
+        <div @keydown.window.prevent.ctrl.s="save(false)" @keydown.window.prevent.meta.s="save(false)"></div>
+    </div>
+{% endset %}
+
+{% block content %}
+    <div x-cloak x-data="pageComponent" @save-page.window="save($event)">
+        <div class="tw:flex tw:flex-wrap tw:gap-x-5 tw:gap-y-10 tw:*:m-0!">
+            <div class="tw:w-full tw:[&_.field]:mb-2!">
+                {{
+                    forms.lightswitchField({
+                        label: 'Enabled'|t('redirector'),
+                        name: 'enabled',
+                        on: data.enabled,
+                        containerAttributes: {
+                            'x-ref': 'enabledSwitch',
+                            '@click': 'syncFromDom($el)',
+                            'x-effect': 'syncToDom($el)',
+                        }
+                    })
+                }}
+            </div>
+            <div class="tw:w-full tw:[&_.field]:mb-2!">
+                {{
+                    forms.selectField({
+                        label: 'Site'|t('redirector'),
+                        name: 'siteHandle',
+                        options: sites,
+                        inputAttributes: {
+                            'x-model': 'data.siteHandle',
+                        }
+                    })
+                }}
+            </div>
+            <div class="tw:w-full tw:lg:w-[calc((100%-20px)*(1/2))] tw:[&_.field]:mb-2!">
+                {{
+                    forms.textField({
+                        label: 'Redirect From'|t('redirector'),
+                        instructions: 'Enter the old URL\'s path (part of the URL after the domain name; e.g. www.example.com<strong>/old-url</strong>)',
+                        name: 'oldUrl',
+                        inputAttributes: {
+                            'x-model': 'data.oldUrl',
+                        }
+                    })
+                }}
+                <div class="instructions">
+                    <p>
+                        {{ 'In case of RegEx match type, RegEx patterns can be defined in Redirect From URL path. (More on <a href="https://regex101.com/" target="_blank">https://regex101.com/</a>)'|t('redirector')|raw }}
+                    </p>
+                </div>
+                <div x-show="errors.oldUrl" class="tw:text-red-600 tw:mt-1" x-text="errors.oldUrl"></div>
+            </div>
+            <div class="tw:w-full tw:lg:w-[calc((100%-20px)*(1/2))] tw:[&_.field]:mb-2!">
+                {{
+                    forms.textField({
+                        label: 'Redirect To'|t('redirector'),
+                        instructions: 'Enter the new URL\'s path (part of the URL after the domain name; e.g. www.example.com<strong>/new-url</strong>)',
+                        name: 'newUrl',
+                        inputAttributes: {
+                            'x-model': 'data.newUrl',
+                        }
+                    })
+                }}
+                <div class="instructions">
+                    <p>
+                        {{ 'In case of RegEx match type, RegEx capture groups can be used in Redirect To URL path. (More on <a href="https://regex101.com/" target="_blank">https://regex101.com/</a>)'|t('redirector')|raw }}
+                    </p>
+                </div>
+                <div x-show="errors.newUrl" class="tw:text-red-600 tw:mt-1" x-text="errors.newUrl"></div>
+            </div>
+            <div class="tw:w-full tw:[&_.field]:mb-2!">
+                {{
+                    forms.selectField({
+                        label: 'Redirect Type'|t('redirector'),
+                        instructions: 'Select which type of redirect should be performed'|t('redirector'),
+                        name: 'httpCode',
+                        options: {
+                            all: {
+                                label: 'Select'|t('redirector'),
+                                value: '',
+                            },
+                            301: {
+                                label: '301 Moved Permanently',
+                                value: '301',
+                            },
+                            302: {
+                                label: '302 Found (Moved Temporarily)',
+                                value: '302',
+                            },                            
+                            307: {
+                                label: '307 Temporary Redirect',
+                                value: '307',
+                            },
+                            308: {
+                                label: '308 Permanent Redirect',
+                                value: '308',
+                            },
+                            410: {
+                                label: '410 Gone',
+                                value: '410',
+                            },
+                        },
+                        inputAttributes: {
+                            'x-model': 'data.httpCode',
+                        }
+                    })
+                }}
+                <div x-show="errors.httpCode" class="tw:text-red-600 tw:mt-1" x-text="errors.httpCode"></div>
+            </div>
+            <div class="tw:w-full tw:lg:w-[calc((100%-60px)*(1/4))] tw:[&_.field]:mb-2!">
+                {{
+                    forms.selectField({
+                        label: 'Match Type'|t('redirector'),
+                        instructions: 'The type of match to apply to the Redirect From value'|t('redirector'),
+                        name: 'matchType',
+                        options: {
+                            all: {
+                                label: 'Select'|t('redirector'),
+                                value: '',
+                            },
+                            exact: {
+                                label: 'Exact Match'|t('redirector'),
+                                value: 'exact',
+                            },
+                            regex: {
+                                label: 'RegEx Match'|t('redirector'),
+                                value: 'regex',
+                            },
+                        },
+                        inputAttributes: {
+                            'x-model': 'data.matchType',
+                        }
+                    })
+                }}
+                <div x-show="errors.matchType" class="tw:text-red-600 tw:mt-1" x-text="errors.matchType"></div>
+            </div>
+            <div x-show="data.matchType == 'regex'" class="tw:w-full tw:lg:w-[calc((100%-60px)*(1/4))] tw:[&_.field]:mb-2!">
+                {{
+                    forms.textField({
+                        label: 'Priority'|t('redirector'),
+                        instructions: 'Define the priority for this redirect. (Higher values takes precedence)'|t('redirector'),
+                        name: 'priority',
+                        inputAttributes: {
+                            'x-model': 'data.priority',
+                        }
+                    })
+                }}
+                <div x-show="errors.priority" class="tw:text-red-600 tw:mt-1" x-text="errors.priority"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            window.axios.defaults.headers.common['Accept'] = 'application/json';
+            window.axios.defaults.headers.common['Content-Type'] = 'application/json';
+            window.axios.defaults.headers.common['X-CSRF-Token'] = '{{ craft.app.request.getCsrfToken()}}';
+            
+            Alpine.data('headerComponent', () => ({
+                save: function(redirectToIndex) {
+                    let self = this;
+
+                    self.$dispatch('save-page', { 'redirectToIndex': redirectToIndex });
+                },
+            }));
+
+            Alpine.data('pageComponent', () => ({
+                initializing: true,
+                busy: false,
+                data: {{ data|json_encode|raw }},
+                errors: {{ errors|json_encode|raw }},
+                init() {
+                    let self = this;
+
+                    console.log('Redirect page init');
+                },
+                save: function($event) {
+                    let self = this;
+
+                    let redirectToIndex = $event.detail.redirectToIndex;
+
+                    if (self.busy) return;
+
+                    self.busy = true;
+
+                    axios.post('{{ cpUrl('redirector/redirects/save-redirect') }}', self.data)
+                        .then(function(response) {
+                            let responseData = response.data;
+
+                            self.busy = false;
+                            if (redirectToIndex) {
+                                window.location.href = '{{ cpUrl('redirector/redirects')|split('?')|first }}';
+                            }
+                            else {
+                                if (self.data.uid == 'new') {
+                                    window.location.href = '{{ cpUrl('redirector/redirects')|split('?')|first }}/' + responseData.uid;
+                                }
+                                else {
+                                    self.data = responseData;
+                                    Craft.cp.displaySuccess('{{ 'Save Completed!'|t('redirector') }}');
+                                }
+                            }                            
+                        })
+                        .catch(function(error) {
+                            let responseData = error.response.data;
+
+                            if (error.response.status == 400) {
+                                let errors = error.response.data;
+
+                                self.resetErrors();
+
+                                for (errorKey in errors) {
+                                    self.errors[errorKey] = errors[errorKey].join('<br>')
+                                }
+                            }
+                            else {
+                                Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                            }
+                        })
+                        .finally(function() {
+                            self.busy = false;
+                        });
+                },
+                resetErrors: function() {
+                    let self = this;
+                    
+                    for (errorKey of Object.keys(self.errors)) {
+                        self.errors[errorKey] = '';
+                    }
+                },
+                syncFromDom(el) {
+                    let self = this;
+
+                    self.data.enabled = el.classList.contains('on');
+                },
+                syncToDom(el) {
+                    let self = this;
+                    
+                    const isOn = !!self.data.enabled;
+                    el.classList.toggle('on', isOn);
+                    el.setAttribute('aria-checked', isOn ? 'true' : 'false');
+                    const input = el.querySelector('input[type="hidden"][name="enabled"]');
+                    if (input) {
+                        input.value = isOn ? '1' : '';
+                    }
+                }
+            }));
+        });
+    </script>
+{% endblock %}

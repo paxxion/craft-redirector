@@ -1,0 +1,69 @@
+{% extends "_layouts/cp" %}
+
+{% import '_includes/forms.twig' as forms %}
+
+{%
+    set crumbs = [
+        { 'label': 'Redirector'|t('redirector'), 'url': url('redirector') },
+        { 'label': 'Settings'|t('redirector') },
+    ]
+%}
+{% set title = 'Settings'|t('redirector') %}
+{% set selectedSubnavItem = 'settings' %}
+{% set fullPageForm = true %}
+
+{% block content %}
+    {{ actionInput('redirector/cp/settings/save') }}
+    {{ redirectInput("redirector/settings") }}
+
+    <div class="flex-fields">
+        {{
+            forms.editableTableField({
+                label: 'Excluded 404'|t('redirector'),
+                instructions: 'Define 404 urls that must be excluded from Audit (these are exact matches after domain, ex. /favicon.ico)'|t('redirector'),
+                id: 'excludedNotFound',
+                name: 'excludedNotFound',
+                required: false,
+                allowAdd: true,
+                allowDelete: true,
+                defaultValues: {
+                    path: "",
+                },
+                cols: {
+                    path: {
+                        heading: 'Path'|t('redirector'),
+                        type: "singleline",
+                        width: "100%",
+                        code: true,
+                    },
+                },
+                rows: settings.excludedNotFound,
+                errors: settings.getErrors("excludedNotFound"),
+            })
+        }}
+        {{
+            forms.editableTableField({
+                label: 'Excluded 404 Patterns'|t('redirector'),
+                instructions: 'Define patterns for 404 urls that must be excluded from Audit (regex tool https://regex101.com/)'|t('redirector'),
+                id: 'excludedNotFoundPatterns',
+                name: 'excludedNotFoundPatterns',
+                required: false,
+                allowAdd: true,
+                allowDelete: true,
+                defaultValues: {
+                    pattern: "",
+                },
+                cols: {
+                    pattern: {
+                        heading: 'RegEx'|t('redirector'),
+                        type: "singleline",
+                        width: "100%",
+                        code: true,
+                    },
+                },
+                rows: settings.excludedNotFoundPatterns,
+                errors: settings.getErrors("excludedNotFoundPatterns"),
+            })
+        }}
+    </div>
+{% endblock %}

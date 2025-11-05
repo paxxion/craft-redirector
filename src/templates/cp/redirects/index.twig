@@ -1,0 +1,787 @@
+{% extends "_layouts/cp" %}
+
+{% import '_includes/forms.twig' as forms %}
+
+{%
+    set crumbs = [
+        { 'label': 'Redirector'|t('redirector'), 'url': url('redirector') },
+        { 'label': 'Redirects'|t('redirector') },
+    ]
+%}
+{% set title = 'Redirects'|t('redirector') %}
+{% set selectedSubnavItem = 'redirects' %}
+{% set fullPageForm = false %}
+{% set actionButton %}
+    <div x-cloak x-data="headerComponent">
+        <button class="btn" @click="exportCsv()">
+            {{ 'Export CSV'|t('redirector') }}
+        </button>
+    </div>
+    <a href="{{ cpUrl('redirector/redirects/import') }}" class="btn">
+        {{ 'Import CSV'|t('redirector') }}
+    </a>
+    <a class="btn submit add icon" href="{{ cpUrl('redirector/redirects/new')|split('?')|first }}">{{ 'New Redirect'|t('redirector') }}</a>
+{% endset %}
+
+{% block content %}
+    <div x-data="pageComponent" @export-csv.window="exportCsv()" class="tw:relative tw:w-full">
+        {# actions row #}
+        <div class="tw:flex tw:items-end tw:gap-x-2 tw:mb-2">
+            {# filters toggle #}
+            <button class="btn" :class="{ 'active': showFilters, 'tw:pointer-events-none': busy }" @click="showFilters = !showFilters">
+                {{ svg('@app/icons/solid/filter-list.svg')|attr({ 'class': 'tw:w-4 tw:h-4 tw:fill-gray-500' }) }}
+            </button>
+            {# refresh #}
+            <button class="btn" @click="loadDataRows()">
+                {{ svg('@app/icons/solid/arrows-rotate.svg')|attr({ 'class': 'tw:w-4 tw:h-4 tw:fill-gray-500' }) }}
+            </button>
+            {# bulk actions #}
+            <div x-cloak x-show="totalDataRowsSelected">
+                <div class="select">
+                    <select x-model="bulkAction" @change="handleBulkAction()">
+                        <option value="" x-text="'{{ 'Selected'|t('redirector') }} (' + totalDataRowsSelected + ')'"></option>
+                        <option value="setHttpCode-301">{{ 'Set status 301'|t('redirector') }}</option>
+                        <option value="setHttpCode-302">{{ 'Set status 302'|t('redirector') }}</option>
+                        <option value="setHttpCode-307">{{ 'Set status 307'|t('redirector') }}</option>
+                        <option value="setHttpCode-410">{{ 'Set status 410'|t('redirector') }}</option>
+                        <option value="setStatus-enabled">{{ 'Enable'|t('redirector') }}</option>
+                        <option value="setStatus-disabled">{{ 'Disable'|t('redirector') }}</option>
+                        <option value="delete">{{ 'Delete'|t('redirector') }}</option>
+                    </select>
+                </div>
+            </div>
+            {# loader #}
+            <div x-cloak x-show="!initializing && busy" class="tw:flex tw:justify-center tw:items-center tw:self-center">
+                <svg aria-hidden="true" class="tw:w-6 tw:h-6 tw:text-gray-200 tw:animate-spin tw:fill-gray-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                </svg>
+                <span class="tw:sr-only">Loading...</span>
+            </div>
+            {# page items #}
+            <div class="tw:ml-auto tw:flex tw:items-center tw:gap-x-2">
+                <div class="">{{ 'Items per page'|t('redirector') }}</div>
+                <div class="select">
+                    <select x-model="data.pageItems" :disabled="busy" @change="pageItemsChange()">                        
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        {# filters row #}
+        <div x-cloak x-show="showFilters" class="pane tw:mt-1!">
+            <div class="tw:flex tw:flex-wrap tw:gap-x-6 tw:gap-y-5 tw:mb-8 tw:[&_.select]:w-full! tw:[&_.select>select]:w-full">                
+                {# enabled #}
+                <div class="tw:grow">
+                    {{
+                        forms.selectField({
+                            label: 'Enabled'|t('redirector'),
+                            name: 'enabled',
+                            options: {
+                                all: {
+                                    label: 'All'|t('redirector'),
+                                    value: '',
+                                },
+                                yes: {
+                                    label: 'Yes'|t('redirector'),
+                                    value: 'yes',
+                                },
+                                No: {
+                                    label: 'No'|t('redirector'),
+                                    value: 'no',
+                                },
+                            },
+                            inputAttributes: {
+                                'x-model': 'data.filters.enabled',
+                            }
+                        })
+                    }}
+                </div>
+                {# old url #}
+                <div class="tw:grow">
+                    {{
+                        forms.textField({
+                            label: 'Redirect From'|t('redirector'),
+                            name: 'oldUrl',
+                            inputAttributes: {
+                                'x-model': 'data.filters.oldUrl',
+                            }
+                        })
+                    }}
+                </div>
+                {# new url #}
+                <div class="tw:grow">
+                    {{
+                        forms.textField({
+                            label: 'Redirect To'|t('redirector'),
+                            name: 'newUrl',
+                            inputAttributes: {
+                                'x-model': 'data.filters.newUrl',
+                            }
+                        })
+                    }}
+                </div>
+                {# site #}
+                <div class="tw:grow">
+                    {{
+                        forms.selectField({
+                            label: 'Site'|t('redirector'),
+                            name: 'site',
+                            options: sites,
+                            inputAttributes: {
+                                'x-model': 'data.filters.site',
+                            }
+                        })
+                    }}
+                </div>
+                {# match type #}
+                <div class="tw:grow">
+                    {{
+                        forms.selectField({
+                            label: 'Match Type'|t('redirector'),
+                            name: 'matchType',
+                            options: {
+                                all: {
+                                    label: 'All'|t('redirector'),
+                                    value: '',
+                                },
+                                exact: {
+                                    label: 'Exact Match'|t('redirector'),
+                                    value: 'exact',
+                                },
+                                regex: {
+                                    label: 'RegEx Match'|t('redirector'),
+                                    value: 'regex',
+                                },
+                            },
+                            inputAttributes: {
+                                'x-model': 'data.filters.matchType',
+                            }
+                        })
+                    }}
+                </div>
+                {# http code #}
+                <div class="tw:grow">
+                    {{
+                        forms.selectField({
+                            label: 'Redirect Type'|t('redirector'),
+                            fieldClass: '',
+                            name: 'httpCode',
+                            options: {
+                                all: {
+                                    label: 'Select'|t('redirector'),
+                                    value: '',
+                                },
+                                301: {
+                                    label: '301',
+                                    value: '301',
+                                },
+                                302: {
+                                    label: '302',
+                                    value: '302',
+                                },
+                                
+                                303: {
+                                    label: '307',
+                                    value: '307',
+                                },
+                                410: {
+                                    label: '410',
+                                    value: '410',
+                                },
+                            },
+                            inputAttributes: {
+                                'x-model': 'data.filters.httpCode',
+                            }
+                        })
+                    }}
+                </div>                
+                {# date from #}
+                <div class="tw:grow">
+                    {{
+                        forms.textField({
+                            label: 'Date From'|t('redirector'),
+                            name: 'dateFrom',
+                            inputAttributes: {
+                                'type': 'date',
+                                'x-model': 'data.filters.dateFrom',
+                            }
+                        })
+                    }}
+                </div>
+                {# date to #}
+                <div class="tw:grow">
+                    {{
+                        forms.textField({
+                            label: 'Date To'|t('redirector'),
+                            name: 'dateTo',
+                            inputAttributes: {
+                                'type': 'date',
+                                'x-model': 'data.filters.dateTo',
+                            }
+                        })
+                    }}
+                </div>
+            </div>
+            <div class="tw:flex tw:justify-center tw:gap-x-4">
+                <button class="btn" @click="applyFilters()">
+                    {{ 'Apply filters'|t('redirector') }}
+                </button>
+                <button class="btn" :disabled="!anyFiltersApplied" :class="{ 'tw:opacity-50 tw:pointer-events-none': !anyFiltersApplied }" @click="resetFilters()">
+                    {{ 'Reset filters'|t('redirector') }}
+                </button>
+            </div>
+        </div>
+        {# data rows #}
+        <div class="tw:relative">
+            {# loader #}
+            <div x-cloak x-show="initializing" class="tw:w-full tw:h-full">
+                <div class="tw:flex tw:justify-center">
+                    <svg aria-hidden="true" class="tw:w-8 tw:h-8 tw:text-gray-200 tw:animate-spin tw:fill-gray-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                    </svg>
+                    <span class="tw:sr-only">Loading...</span>
+                </div>
+            </div>
+            {# content #}
+            <div class="tw:overflow-x-auto">
+                {# table #}
+                <table x-cloak x-show="!initializing" class="data tw:w-[1480px] tw:2xl:w-full">
+                    <thead class="">
+                        <th class="checkbox-cell">
+                            <button @click="toggleSelectionAllDataRows()">
+                                <div class="checkbox" :class="{ 'checked': allDataRowsSelected, 'indeterminate': !allDataRowsSelected && totalDataRowsSelected  }"></div>
+                            </button>
+                        </th>                        
+                        <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'oldUrl' }" @click="setSort('oldUrl')">
+                            <div class="tw:flex tw:justify-between tw:items-center">
+                                <span>{{ 'Redirect From'|t('redirector') }}</span>
+                                <div x-show="data.sortField == 'oldUrl'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
+                                    <div x-show="data.sortDirection == 'asc'">
+                                        {{ svg('@app/icons/solid/angle-up.svg') }}
+                                    </div>
+                                    <div x-show="data.sortDirection == 'desc'">
+                                        {{ svg('@app/icons/solid/angle-down.svg') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                        <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'newUrl' }" @click="setSort('newUrl')">
+                            <div class="tw:flex tw:justify-between tw:items-center">
+                                <span>{{ 'Redirect To'|t('redirector') }}</span>
+                                <div x-show="data.sortField == 'newUrl'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
+                                    <div x-show="data.sortDirection == 'asc'">
+                                        {{ svg('@app/icons/solid/angle-up.svg') }}
+                                    </div>
+                                    <div x-show="data.sortDirection == 'desc'">
+                                        {{ svg('@app/icons/solid/angle-down.svg') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                        <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'sites.name' }" @click="setSort('sites.name')">
+                            <div class="tw:flex tw:justify-between tw:items-center">
+                                <span>{{ 'Site'|t('redirector') }}</span>
+                                <div x-show="data.sortField == 'sites.name'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
+                                    <div x-show="data.sortDirection == 'asc'">
+                                        {{ svg('@app/icons/solid/angle-up.svg') }}
+                                    </div>
+                                    <div x-show="data.sortDirection == 'desc'">
+                                        {{ svg('@app/icons/solid/angle-down.svg') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                        <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'matchType' }" @click="setSort('matchType')">
+                            <div class="tw:flex tw:justify-between tw:items-center">
+                                <span>{{ 'Match Type'|t('redirector') }}</span>
+                                <div x-show="data.sortField == 'matchType'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
+                                    <div x-show="data.sortDirection == 'asc'">
+                                        {{ svg('@app/icons/solid/angle-up.svg') }}
+                                    </div>
+                                    <div x-show="data.sortDirection == 'desc'">
+                                        {{ svg('@app/icons/solid/angle-down.svg') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                        <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'priority' }" @click="setSort('priority')">
+                            <div class="tw:flex tw:justify-between tw:items-center">
+                                <span>{{ 'Priority'|t('redirector') }}</span>
+                                <div x-show="data.sortField == 'priority'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
+                                    <div x-show="data.sortDirection == 'asc'">
+                                        {{ svg('@app/icons/solid/angle-up.svg') }}
+                                    </div>
+                                    <div x-show="data.sortDirection == 'desc'">
+                                        {{ svg('@app/icons/solid/angle-down.svg') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                         <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'httpCode' }" @click="setSort('httpCode')">
+                            <div class="tw:flex tw:justify-between tw:items-center">
+                                <span>{{ 'HTTP Code'|t('redirector') }}</span>
+                                <div x-show="data.sortField == 'httpCode'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
+                                    <div x-show="data.sortDirection == 'asc'">
+                                        {{ svg('@app/icons/solid/angle-up.svg') }}
+                                    </div>
+                                    <div x-show="data.sortDirection == 'desc'">
+                                        {{ svg('@app/icons/solid/angle-down.svg') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                        <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'totalHits' }" @click="setSort('totalHits')">
+                            <div class="tw:flex tw:justify-between tw:items-center">
+                                <span>{{ 'Total Hits'|t('redirector') }}</span>
+                                <div x-show="data.sortField == 'totalHits'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
+                                    <div x-show="data.sortDirection == 'asc'">
+                                        {{ svg('@app/icons/solid/angle-up.svg') }}
+                                    </div>
+                                    <div x-show="data.sortDirection == 'desc'">
+                                        {{ svg('@app/icons/solid/angle-down.svg') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                        <th class="tw:cursor-pointer!" :class="{ 'tw:bg-selection-light!': data.sortField == 'dateLastHit' }" @click="setSort('dateLastHit')">
+                            <div class="tw:flex tw:justify-between tw:items-center">
+                                <span>{{ 'Last Hit'|t('redirector') }}</span>
+                                <div x-show="data.sortField == 'dateLastHit'" class="tw:[&_svg]:w-3.5 tw:[&_svg]:h-3.5">
+                                    <div x-show="data.sortDirection == 'asc'">
+                                        {{ svg('@app/icons/solid/angle-up.svg') }}
+                                    </div>
+                                    <div x-show="data.sortDirection == 'desc'">
+                                        {{ svg('@app/icons/solid/angle-down.svg') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                        <th>
+                           <div class="tw:flex tw:justify-between tw:items-center tw:w-fit tw:mx-auto">
+                                <span>{{ 'Actions'|t('redirector') }}</span>
+                            </div>
+                        </th>
+                    </thead>
+                    <tbody class="">
+                        <template x-if="dataRows">
+                            <template x-for="dataRow in dataRows">
+                                <tr>
+                                    <td class="checkbox-cell">
+                                        <button @click="dataRow.selected = !dataRow.selected">
+                                            <div class="checkbox" :class="{ 'checked': dataRow.selected  }"></div>
+                                        </button>
+                                    </td>                                    
+                                    <td>
+                                        <div class="tw:flex tw:items-center tw:gap-x-2">
+                                            <div class="status tw:m-0!" :class="{ 'live': dataRow.enabled, 'disabled': !dataRow.enabled }"></div>
+                                            <div x-text="dataRow.oldUrl"></div>
+                                        </div>
+                                    </td>                                 
+                                    <td>
+                                        <div x-text="dataRow.newUrl"></div>
+                                    </td>
+                                    <td>
+                                        <div x-text="dataRow.siteName"></div>
+                                    </td>
+                                    <td>
+                                        <div x-text="dataRow.matchType"></div>
+                                    </td>
+                                    <td>
+                                        <div x-text="dataRow.priority"></div>
+                                    </td>
+                                    <td>
+                                        <div x-text="dataRow.httpCode"></div>
+                                    </td>
+                                    <td>
+                                        <div x-text="dataRow.totalHits"></div>
+                                    </td>
+                                    <td>
+                                        <div x-text="dataRow.dateLastHit"></div>
+                                    </td>
+                                    <td class="tw:w-24">
+                                        <div class="tw:flex tw:justify-center tw:items-center tw:gap-x-4">
+                                            <a :href="'{{ cpUrl('redirector/redirects')|split('?')|first }}/' + dataRow.uid">
+                                                {{ svg('@app/icons/solid/pen-to-square.svg')|attr({ 'class': 'tw:w-5 tw:h-5 tw:fill-gray-500' }) }}
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </template>
+                    </tbody>
+                </table>
+                {# pagination #}
+                <template x-if="pagination && pagination.pages > 0">
+                    <div class="tw:select-none">
+                        <div class="tw:flex tw:items-center tw:flex-column tw:flex-wrap tw:md:flex-row tw:justify-between tw:pt-4">
+                            <span class="tw:text-sm tw:font-normal tw:text-gray-500 tw:mb-4 tw:md:mb-0 tw:block tw:w-full tw:md:inline tw:md:w-auto">
+                                <span class="tw:font-semibold tw:text-gray-900" x-text="pagination.rowsFrom + '-' + pagination.rowsTo">1-10</span>
+                                <span>{{ 'of'|t('redirector') }}</span>
+                                <span class="tw:font-semibold tw:text-gray-900" x-text="pagination.totalRows"></span>
+                            </span>
+                            <div x-show="pagination.pages > 1" class="tw:flex tw:text-sm tw:p-1">
+                                <button class="tw:flex tw:items-center tw:justify-center tw:px-3! tw:h-8 tw:leading-tight tw:text-gray-500 tw:bg-white tw:border tw:border-gray-300 tw:hover:bg-gray-100! tw:hover:text-gray-700! tw:cursor-pointer tw:rounded-s-lg" :class="{ 'tw:pointer-events-none tw:opacity-50': pagination.page == 1 }" @click="setPage(1)">
+                                    {{ svg('@app/icons/solid/angles-left.svg')|attr({ 'class': 'tw:w-3.5 tw:h-3.5 tw:fill-gray-500' }) }}
+                                </button>
+                                <button class="tw:flex tw:items-center tw:justify-center tw:px-3! tw:h-8 tw:leading-tight tw:text-gray-500 tw:bg-white tw:border tw:border-gray-300 tw:hover:bg-gray-100! tw:hover:text-gray-700! tw:cursor-pointer" :class="{ 'tw:pointer-events-none tw:opacity-50': pagination.page == 1 }" @click="setPage(pagination.page - 1)">
+                                    {{ svg('@app/icons/solid/angle-left.svg')|attr({ 'class': 'tw:w-3.5 tw:h-3.5 tw:fill-gray-500' }) }}
+                                </button>
+                                <template x-for="page in getPaginationRange(pagination.page, pagination.pages)">
+                                    <button class="tw:flex tw:items-center tw:justify-center tw:px-3! tw:h-8 tw:leading-tight tw:text-gray-500 tw:bg-white tw:border tw:border-gray-300 tw:hover:bg-gray-100! tw:hover:text-gray-700! tw:cursor-pointer" :class="{ 'tw:font-bold! tw:underline!': page == pagination.page }" x-text="page" @click="setPage(page)"></button>
+                                </template>
+                                <button class="tw:flex tw:items-center tw:justify-center tw:px-3! tw:h-8 tw:leading-tight tw:text-gray-500 tw:bg-white tw:border tw:border-gray-300 tw:hover:bg-gray-100! tw:hover:text-gray-700! tw:cursor-pointer" :class="{ 'tw:pointer-events-none tw:opacity-50': pagination.page == pagination.pages }" @click="setPage(pagination.page + 1)">
+                                    {{ svg('@app/icons/solid/angle-right.svg')|attr({ 'class': 'tw:w-3.5 tw:h-3.5 tw:fill-gray-500' }) }}
+                                </button>
+                                <button class="tw:flex tw:items-center tw:justify-center tw:px-3! tw:h-8 tw:leading-tight tw:text-gray-500 tw:bg-white tw:border tw:border-gray-300 tw:hover:bg-gray-100! tw:hover:text-gray-700! tw:cursor-pointer tw:rounded-e-lg" :class="{ 'tw:pointer-events-none tw:opacity-50': pagination.page == pagination.pages }" @click="setPage(pagination.pages)">
+                                    {{ svg('@app/icons/solid/angles-right.svg')|attr({ 'class': 'tw:w-3.5 tw:h-3.5 tw:fill-gray-500' }) }}
+                                </button>
+                            </div>                            
+                        </div>
+                    </div>
+                </template>
+                {# no rows #}
+                <template x-if="(dataRows == null && !initializing) || (dataRows && dataRows.length == 0)">
+                    <div class="tw:text-center tw:py-4 tw:font-bold">
+                        {{ 'No entries'|t('redirector') }}
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            window.axios.defaults.headers.common['Accept'] = 'application/json';
+            window.axios.defaults.headers.common['Content-Type'] = 'application/json';
+            window.axios.defaults.headers.common['X-CSRF-Token'] = '{{ craft.app.request.getCsrfToken()}}';
+
+            Alpine.data('headerComponent', () => ({
+                exportCsv: function() {
+                    let self = this;
+
+                    self.$dispatch('export-csv');
+                },
+            }));
+
+            Alpine.data('pageComponent', () => ({
+                initializing: true,
+                busy: false,
+                bulkAction: '',
+                showFilters: false,
+                dataRows: null,
+                pagination: null,
+                data: {
+                    sortField: 'dateLastHit',
+                    sortDirection: 'desc',
+                    pageItems: 50,
+                    page: 1,
+                    filters: {
+                        enabled: '',
+                        oldUrl: '',
+                        newUrl: '',
+                        site: '',
+                        matchType: '',
+                        httpCode: '',
+                        dateFrom: '',
+                        dateTo: '',
+                    },
+                },
+                init() {
+                    let self = this;
+
+                    console.log('Redirects page init');
+
+                    const saved = localStorage.getItem('redirector-redirects-index-{{ currentUser.uid }}');
+                    if (saved) {
+                        try {
+                            self.data = JSON.parse(saved);
+                        } catch (e) {}
+                    }
+
+                    self.showFilters = self.anyFiltersApplied;
+
+                    self.loadDataRows();
+                },                
+                loadDataRows: function() {
+                    let self = this;
+
+                    if (self.busy) return;
+
+                    self.busy = true;
+
+                    axios.post('{{ cpUrl('redirector/redirects/get-rows') }}', self.data)
+                        .then(function(response) {
+                            let responseData = response.data;
+
+                            self.dataRows = responseData.dataRows;
+                            self.pagination = responseData.pagination;
+
+                            localStorage.setItem('redirector-redirects-index-{{ currentUser.uid }}', JSON.stringify(self.data));
+                        })
+                        .catch(function(error) {
+                            let responseData = error.response.data;
+
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                        })
+                        .finally(function() {
+                            self.initializing = false;
+                            self.busy = false;
+                        });
+                },
+                exportCsv: function() {
+                    let self = this;
+
+                    if (self.busy) return;
+
+                    self.busy = true;
+
+                    axios.post('{{ cpUrl('redirector/redirects/export-csv') }}', self.data, { responseType: 'blob' })
+                        .then(function(response) {
+                            const blob = new Blob([response.data], { type: 'text/csv' });
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.download = 'redirects.csv';
+                            link.click();
+                            URL.revokeObjectURL(url);
+                        })
+                        .catch(function(error) {
+                            let responseData = error.response.data;
+
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                        })
+                        .finally(function() {
+                            self.initializing = false;
+                            self.busy = false;
+                        });
+                },
+                applyFilters: function() {
+                    let self = this;
+
+                    if (self.busy) return;
+
+                    self.loadDataRows();
+                },
+                resetFilters: function() {
+                    let self = this;
+
+                    if (self.busy) return;
+
+                    self.resetFiltersFields();
+                    self.loadDataRows();
+                },
+                resetFiltersFields: function() {
+                    let self = this;
+
+                    _.forIn(self.data.filters, function(value, key) {
+                        self.data.filters[key] = '';
+                    });
+                },
+                deleteRow: function(id) {
+                    let self = this;
+
+                    if (self.busy) return;
+
+                    if (window.confirm('{{ 'Delete row?'|t('redirector') }}')) {
+                        self.deleteDataRows([ id ]);
+                    }
+                },
+                updateDataRows: function(rowsToUpdate, data) {
+                    let self = this;
+
+                    if (self.busy) return;
+
+                    self.busy = true;
+
+                    let postData = _.merge({}, { rows: rowsToUpdate }, data);
+
+                    axios.post('{{ cpUrl('redirector/redirects/update-rows') }}', postData)
+                        .then(function(response) {
+                            let responseData = response.data;
+
+                            self.busy = false;
+                            self.loadDataRows();
+
+                            Craft.cp.displaySuccess('{{ 'Update completed!'|t('redirector') }}');
+                        })
+                        .catch(function(error) {
+                            let responseData = error.response.data;
+
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                        })
+                        .finally(function() {
+                            self.busy = false;
+                        });
+                },
+                deleteDataRows: function(rowsToDelete) {
+                    let self = this;
+
+                    if (self.busy) return;
+
+                    self.busy = true;
+
+                    let postData = {
+                        rows: rowsToDelete,
+                    };
+
+                    axios.post('{{ cpUrl('redirector/redirects/delete-rows') }}', postData)
+                        .then(function(response) {
+                            let responseData = response.data;
+
+                            self.busy = false;
+                            self.loadDataRows();
+
+                            Craft.cp.displaySuccess('{{ 'Deletion completed!'|t('redirector') }}');
+                        })
+                        .catch(function(error) {
+                            let responseData = error.response.data;
+
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('redirector') }}');
+                        })
+                        .finally(function() {
+                            self.busy = false;
+                        });
+                },
+                pageItemsChange: function() {
+                    let self = this;
+
+                    self.data.page = 1;
+                    self.loadDataRows();
+                },
+                toggleSelectionAllDataRows: function() {
+                    let self = this;
+
+                    let selected = !self.allDataRowsSelected;
+
+                    _.forEach(self.dataRows, function(dataRow) {
+                        dataRow.selected = selected;
+                    });
+                },
+                handleBulkAction: function() {
+                    let self = this;
+
+                    if (self.busy) return;
+
+                    let selectedRows = _.chain(self.dataRows)
+                        .filter(function(dataRow) {
+                            return dataRow.selected;
+                        })
+                        .map(function(dataRow) {
+                            return dataRow.id;
+                        })
+                        .value();
+
+                    if (self.bulkAction.startsWith('setHttpCode')) {
+                        let httpCode = self.bulkAction.split('-')[1];
+                        if (window.confirm(('{{ 'Update selected rows http code to ##code##?'|t('redirector') }}').replace('##code##', httpCode))) {
+                            self.updateDataRows(selectedRows, { httpCode: httpCode });
+                        }
+                    }
+
+                    if (self.bulkAction.startsWith('setStatus')) {
+                        let status = self.bulkAction.split('-')[1];
+                        let label = status == 'enabled'
+                            ? '{{ 'Enabled'|t('redirector') }}'
+                            : '{{ 'Disabled'|t('redirector') }}';
+                        if (window.confirm(('{{ 'Update selected rows status to ##status##?'|t('redirector') }}').replace('##status##', label))) {
+                            self.updateDataRows(selectedRows, { status: status });
+                        }
+                    }
+
+                    if (self.bulkAction == 'delete' && window.confirm('{{ 'Delete selected rows?'|t('redirector') }}')) {
+                        self.deleteDataRows(selectedRows);
+                    }
+
+                    self.bulkAction = '';
+                },
+                setSort: function(sortField) {
+                    let self = this;
+
+                    if (self.busy) return;
+
+                    if (self.data.sortField != sortField) {
+                        self.data.sortField = sortField;
+                    }
+                    else {
+                        self.data.sortDirection = self.data.sortDirection == 'asc' ? 'desc' : 'asc';
+                    }
+
+                    self.loadDataRows();
+                },
+                setPage: function(page) {
+                    let self = this;
+
+                    if (self.busy) return;
+                    
+                    if (page == self.data.page) return;
+
+                    if (page < 1) {
+                        page = 1;
+                    }
+
+                    if (page > self.pagination.pages) {
+                        page = self.pagination.pages;
+                    }
+
+                    self.data.page = page;
+                    self.loadDataRows();
+                },
+                getPaginationRange: function(page, totalPages, maxVisible = 3) {
+                    const half = Math.floor(maxVisible / 2);
+                    let start = page - half;
+                    let end = page + half;
+
+                    if (start < 1) {
+                        start = 1;
+                        end = Math.min(totalPages, maxVisible);
+                    }
+
+                    if (end > totalPages) {
+                        end = totalPages;
+                        start = Math.max(1, totalPages - maxVisible + 1);
+                    }
+                    
+                    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+                },                
+                get allDataRowsSelected() {
+                    let self = this;
+
+                    if (!self.dataRows || !self.dataRows.length) return false;
+
+                    let result = _.every(self.dataRows, function(dataRow) {
+                        return dataRow.selected;
+                    });
+
+                    return result;
+                },
+                get totalDataRowsSelected() {
+                    let self = this;
+
+                    let result = _.filter(self.dataRows, function(dataRow) {
+                        return dataRow.selected;
+                    });
+
+                    return result.length;
+                },
+                get anyFiltersApplied() {
+                    let self = this;
+
+                    let filtered = false;
+                    _.forIn(self.data.filters, function(value, key) {
+                        if (self.data.filters[key] != '') {
+                            filtered = true;
+
+                            // this return is to exit the _.forIn
+                            return false;
+                        }
+                    });
+
+                    return filtered;
+                },
+            }));
+        });
+    </script>
+{% endblock %}

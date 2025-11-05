@@ -1,0 +1,35 @@
+/* sources */
+@source "../../../templates/**/*.twig";
+@source "../js/**/*.js";
+
+/* define layer order */
+@layer theme, base, components, utilities;
+
+/* plugins */
+@plugin "@tailwindcss/typography";
+
+/* theme */
+@import "tailwindcss/theme.css" layer(theme) prefix(tw);
+@theme {
+    --color-selection-light: #cdd8e4;
+}
+
+/* base */
+@layer base {
+    [x-cloak] {
+        @apply tw:!hidden;
+    }
+}
+
+/* components */
+@layer components {
+    
+}
+
+/* utilities */
+@import "tailwindcss/utilities.css" layer(utilities) prefix(tw);
+@layer utilities {
+    .test {
+        @apply tw:bg-red-500;
+    }
+}

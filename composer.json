@@ -1,0 +1,40 @@
+{
+  "name": "paxxion/craft-redirector",
+  "description": "Redirector helps you redirect 404 urls to prevent SEO value loss",
+  "type": "craft-plugin",
+  "license": "proprietary",
+  "support": {
+    "email": "web@paxxion.com",
+    "issues": "https://github.com/paxxion/craft-redirector/issues?state=open",
+    "source": "https://github.com/paxxion/craft-redirector",
+    "docs": "https://github.com/paxxion/craft-redirector",
+    "rss": "https://github.com/paxxion/craft-redirector/releases.atom"
+  },
+  "require": {
+    "php": ">=8.2",
+    "craftcms/cms": "^5.8.0",
+    "nesbot/carbon": "^3.10"
+  },
+  "autoload": {
+    "psr-4": {
+      "paxxion\\craftredirector\\": "src/"
+    }
+  },
+  "extra": {
+    "handle": "redirector",
+    "name": "Redirector",
+    "developer": "Paxxion",
+    "documentationUrl": "https://github.com/paxxion/craft-redirector",
+    "class": "paxxion\\craftredirector\\Redirector"
+  },
+  "config": {
+    "sort-packages": true,
+    "platform": {
+      "php": "8.2"
+    },
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
+  }
+}
