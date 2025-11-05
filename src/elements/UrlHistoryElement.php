@@ -52,7 +52,7 @@ class UrlHistoryElement extends BaseUiElement
             }
         }
 
-        return Craft::$app->getView()->renderTemplate('redirector/cp/elements/urlHistory', [
+        return Craft::$app->getView()->renderTemplate('pxx-redirector/cp/elements/urlHistory', [
             'rows' => $rows,
         ]);
     }

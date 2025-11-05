@@ -5,3 +5,6 @@
 
 ## 1.0.1
 - Updated handle
+
+## 1.0.2
+- Fixes after handle update
