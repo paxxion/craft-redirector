@@ -8,3 +8,6 @@
 
 ## 1.0.2
 - Fixes after handle update
+
+## 1.0.3
+- Fixed an error occuring while generating automatic redirect on an entry save

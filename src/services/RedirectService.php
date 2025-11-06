@@ -5,7 +5,7 @@ namespace paxxion\craftredirector\services;
 use Carbon\Carbon;
 use Craft;
 use craft\base\Component;
-use craft\helpers\UrlHelper;
+use Exception;
 use paxxion\craftredirector\records\NotFoundRecord;
 use paxxion\craftredirector\records\RedirectRecord;
 use paxxion\craftredirector\Redirector;
@@ -210,62 +210,92 @@ class RedirectService extends Component
 
     public static function setHandledNotFoundRow($notFoundRow)
     {
-        if (is_null($notFoundRow)) return;
+        try
+        {
+            if (is_null($notFoundRow)) return;
 
-        $notFoundRow->handled = true;
-        $notFoundRow->save();
+            $notFoundRow->handled = true;
+            $notFoundRow->save();
+        }
+        catch (\Throwable $ex) {
+            Craft::error('Redirector - error setting handled on not found row: ' . $ex->getMessage());
+
+            if (Craft::$app->getConfig()->getGeneral()->devMode) {
+                throw $ex;
+            }
+        }
     }
 
     public static function redirectTo($exception, $redirectUrl, $redirectHttpCode)
     {
-        $response = Craft::$app->getResponse();
-        $response->setNoCacheHeaders();
+        try
+        {
+            $response = Craft::$app->getResponse();
+            $response->setNoCacheHeaders();
 
-        // if 410 use the current $exception and change its' status code to 410 so the correct template will be used
-        if ($redirectHttpCode == 410) {
-            $errorHandler = Craft::$app->getErrorHandler();
-            $errorHandler->exception = $exception;
-            $errorHandler->exception->statusCode = $redirectHttpCode;
+            // if 410 use the current $exception and change its' status code to 410 so the correct template will be used
+            if ($redirectHttpCode == 410) {
+                $errorHandler = Craft::$app->getErrorHandler();
+                $errorHandler->exception = $exception;
+                $errorHandler->exception->statusCode = $redirectHttpCode;
+                
+                $response = Craft::$app->runAction('templates/render-error');
+                $response->setStatusCode($redirectHttpCode);
+                $response->send();
+                
+                Craft::$app->end();
+            }
+
+            $currentSite = Craft::$app->getSites()->getCurrentSite();
+
+            $redirectUrl = '/' . trim($redirectUrl, '/');
+
+            $redirectSite = null;
+            $sites = Craft::$app->getSites()->getAllSites();
+            foreach ($sites as $site) {
+                $siteBaseUrl = trim($site->getBaseUrl(), '/');
+                $sitePath = parse_url($siteBaseUrl, PHP_URL_PATH);
+
+                if ($sitePath && str_starts_with($redirectUrl, $sitePath)) {
+                    $redirectSite = $site;
+                    $redirectUrl = '/' . trim(str_replace($sitePath, '', $redirectUrl), '/');
+                    break;
+                }
+            }
+
+            if (is_null($redirectSite)) {
+                $redirectSite = $currentSite;
+            }
+
+            $redirectSiteBaseUrl = trim($redirectSite->getBaseUrl(), '/');
+            $redirectUrl = $redirectSiteBaseUrl . $redirectUrl;
             
-            $response = Craft::$app->runAction('templates/render-error');
-            $response->setStatusCode($redirectHttpCode);
-            $response->send();
             
+            $response->redirect($redirectUrl, $redirectHttpCode)->send();
             Craft::$app->end();
         }
+        catch (\Throwable $ex) {
+            Craft::error('Redirector - error redirecting exception: ' . $ex->getMessage());
 
-        $currentSite = Craft::$app->getSites()->getCurrentSite();
-
-        $redirectUrl = '/' . trim($redirectUrl, '/');
-
-        $redirectSite = null;
-        $sites = Craft::$app->getSites()->getAllSites();
-        foreach ($sites as $site) {
-            $siteBaseUrl = trim($site->getBaseUrl(), '/');
-            $sitePath = parse_url($siteBaseUrl, PHP_URL_PATH);
-
-            if ($sitePath && str_starts_with($redirectUrl, $sitePath)) {
-                $redirectSite = $site;
-                $redirectUrl = '/' . trim(str_replace($sitePath, '', $redirectUrl), '/');
-                break;
+            if (Craft::$app->getConfig()->getGeneral()->devMode) {
+                throw $ex;
             }
         }
-
-        if (is_null($redirectSite)) {
-            $redirectSite = $currentSite;
-        }
-
-        $redirectSiteBaseUrl = trim($redirectSite->getBaseUrl(), '/');
-        $redirectUrl = $redirectSiteBaseUrl . $redirectUrl;
-        
-        
-        $response->redirect($redirectUrl, $redirectHttpCode)->send();
-        Craft::$app->end();
     }
 
     public static function increaseHits($redirect) {
-        $redirect->totalHits += 1;
-        $redirect->dateLastHit = Carbon::now();
-        $redirect->save();
+        try
+        {
+            $redirect->totalHits += 1;
+            $redirect->dateLastHit = Carbon::now();
+            $redirect->save();
+        }
+        catch (\Throwable $ex) {
+            Craft::error('Redirector - error increasing hits: ' . $ex->getMessage());
+
+            if (Craft::$app->getConfig()->getGeneral()->devMode) {
+                throw $ex;
+            }
+        }
     }
 }
