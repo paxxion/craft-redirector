@@ -1,16 +1,26 @@
 # Release Notes for Redirector
 
-## 1.0.0
-- Initial release
+## 1.0.4 - 2025-11-06
 
-## 1.0.1
-- Updated handle
+### Fixed
+- Fixed csv import
 
-## 1.0.2
-- Fixes after handle update
+## 1.0.3 - 2025-11-06
 
-## 1.0.3
+### Fixed
 - Fixed an error occuring while generating automatic redirect on an entry save
 
-## 1.0.4
-- Fixed csv import
+## 1.0.2 - 2025-11-05
+
+### Fixed
+- Fixes after handle update
+
+## 1.0.1 - 2025-11-05
+
+### Updated
+- Updated handle
+
+## 1.0.0 - 2025-11-05
+
+### Added
+- Initial release
