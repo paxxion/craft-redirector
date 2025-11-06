@@ -323,6 +323,8 @@ class RedirectsController extends Controller
                     $oldUrl = $row['oldUrl'];
                     $newUrl = $row['newUrl'];
 
+                    if ($oldUrl == $newUrl) continue;
+
                     if (str_starts_with($oldUrl, 'http')) {
                         $path = '/' . trim(parse_url($oldUrl, PHP_URL_PATH), '/');
                         $query = parse_url($oldUrl, PHP_URL_QUERY);

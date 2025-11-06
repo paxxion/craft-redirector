@@ -36,7 +36,7 @@ use paxxion\craftredirector\services\StashService;
  */
 class Redirector extends Plugin
 {
-    public string $schemaVersion = '1.0.3';
+    public string $schemaVersion = '1.0.4';
     public bool $hasCpSections = true;
     public bool $hasCpSettings = true;
 

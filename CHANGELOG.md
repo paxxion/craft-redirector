@@ -11,3 +11,6 @@
 
 ## 1.0.3
 - Fixed an error occuring while generating automatic redirect on an entry save
+
+## 1.0.4
+- Fixed csv import
