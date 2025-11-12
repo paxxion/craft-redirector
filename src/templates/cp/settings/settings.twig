@@ -2,6 +2,8 @@
 
 {% import '_includes/forms.twig' as forms %}
 
+{% do view.registerAssetBundle("paxxion\\craftredirector\\assets\\RedirectorAssets") %}
+
 {%
     set crumbs = [
         { 'label': 'Redirector'|t('pxx-redirector'), 'url': url('pxx-redirector') },
@@ -15,7 +17,8 @@
 {% block content %}
     {{ actionInput('pxx-redirector/cp/settings/save') }}
     {{ redirectInput("redirector/settings") }}
-
+    {# Audit #}
+    <div class="tw:text-xl tw:font-bold tw:leading-none tw:mb-5">{{ 'Audit'|t('pxx-redirector') }}</div>
     <div class="flex-fields">
         {{
             forms.editableTableField({
@@ -66,4 +69,220 @@
             })
         }}
     </div>
+    <hr>
+    {# Redirects #}
+    <div>
+        <div class="tw:text-xl tw:font-bold tw:leading-none tw:mb-5">{{ 'Redirects'|t('pxx-redirector') }}</div>
+        <div class="flex-fields tw:mb-4! tw:*:mb-0!">
+            {{
+                forms.autosuggestField({
+                    label: 'OpenAI API Key'|t('pxx-redirector'),
+                    id: 'openAiApiKey',
+                    name: 'openAiApiKey',
+                    suggestEnvVars: true,
+                    suggestAliases: true,
+                    value: settings.openAiApiKey,
+                })
+            }}
+        </div>
+        <div x-data="redirectsComponent" class="flex-fields">
+            {% if settings.openAiApiKey %}
+                <div class="field">
+                    <div class="tw:flex tw:items-center tw:gap-x-4">
+                        <button class="btn" type="button" @click="verifyConnection()">
+                            {{ 'Verify connection'|t('pxx-redirector') }}
+                        </button>
+                        {# loader #}
+                        <div x-cloak x-show="connectionBusy" class="tw:flex tw:justify-center tw:items-center tw:self-center">
+                            <svg aria-hidden="true" class="tw:w-6 tw:h-6 tw:text-gray-200 tw:animate-spin tw:fill-gray-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                            </svg>
+                            <span class="tw:sr-only">Loading...</span>
+                        </div>
+                        <div class="tw:flex tw:gap-x-2" x-show="connectionStatus.message">
+                            <template x-if="connectionStatus.success">
+                                {{ svg('@app/icons/solid/circle-check.svg')|attr({ 'class': 'tw:shrink-0 tw:w-5 tw:h-5 tw:fill-green-500' }) }}
+                            </template>
+                            <template x-if="!connectionStatus.success">
+                                {{ svg('@app/icons/solid/circle-xmark.svg')|attr({ 'class': 'tw:shrink-0 tw:w-5 tw:h-5 tw:fill-red-500' }) }}
+                            </template>
+                            <span class="tw:shrink" x-html="connectionStatus.message"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="heading">
+                        <label>{{ 'AI Suggestions'|t('pxx-redirector') }}</label>
+                    </div>
+                    <div class="instructions">
+                        <p>
+                            {{ 'AI suggestions will be available when creating redirects, after the website data is created and uploaded to OpenAI servers.'|t('pxx-redirector') }}<br>
+                            {{ 'The data uploaded on OpenAI servers is available at link <a href=\"https://platform.openai.com/storage/files/\" target=\"_blank\">https://platform.openai.com/storage/files/</a>'|t('pxx-redirector')|raw }}
+                        </p>
+                    </div>
+                    <div class="tw:flex tw:flex-col tw:gap-y-2">
+                        <div class="tw:flex tw:items-center tw:gap-x-4">
+                            <button type="button" class="btn" @click="generateAiKnowledgeBase()">
+                                {{ 'Generate data'|t('pxx-redirector') }}
+                            </button>
+                            <div x-cloak x-show="dataGeneratedDate">
+                                {{ 'Generated on'|t('pxx-redirector') }}
+                                <span x-html="dataGeneratedDate"></span>
+                            </div>
+                            {# loader #}
+                            <div x-cloak x-show="dataGenerateBusy" class="tw:flex tw:justify-center tw:items-center tw:self-center">
+                                <svg aria-hidden="true" class="tw:w-6 tw:h-6 tw:text-gray-200 tw:animate-spin tw:fill-gray-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                </svg>
+                                <span class="tw:sr-only">Loading...</span>
+                            </div>
+                            <div class="tw:flex tw:gap-x-2" x-show="dataGenerateStatus.message">
+                                <template x-if="dataGenerateStatus.success">
+                                    {{ svg('@app/icons/solid/circle-check.svg')|attr({ 'class': 'tw:shrink-0 tw:w-5 tw:h-5 tw:fill-green-500' }) }}
+                                </template>
+                                <template x-if="!dataGenerateStatus.success">
+                                    {{ svg('@app/icons/solid/circle-xmark.svg')|attr({ 'class': 'tw:shrink-0 tw:w-5 tw:h-5 tw:fill-red-500' }) }}
+                                </template>
+                                <span class="tw:shrink" x-html="dataGenerateStatus.message"></span>
+                            </div>
+                        </div>
+                        <div class="tw:flex tw:items-center tw:gap-x-4">
+                            <button type="button" class="btn" @click="uploadAiKnowledgeBase()">
+                                {{ 'Upload data'|t('pxx-redirector') }}
+                            </button>
+                            <div x-cloak x-show="dataUploadedDate">
+                                {{ 'Uploaded on'|t('pxx-redirector') }}
+                                <span x-html="dataUploadedDate"></span>
+                            </div>
+                            {# loader #}
+                            <div x-cloak x-show="dataUploadBusy" class="tw:flex tw:justify-center tw:items-center tw:self-center">
+                                <svg aria-hidden="true" class="tw:w-6 tw:h-6 tw:text-gray-200 tw:animate-spin tw:fill-gray-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                </svg>
+                                <span class="tw:sr-only">Loading...</span>
+                            </div>
+                            <div class="tw:flex tw:gap-x-2" x-show="dataUploadStatus.message">
+                                <template x-if="dataUploadStatus.success">
+                                    {{ svg('@app/icons/solid/circle-check.svg')|attr({ 'class': 'tw:shrink-0 tw:w-5 tw:h-5 tw:fill-green-500' }) }}
+                                </template>
+                                <template x-if="!dataUploadStatus.success">
+                                    {{ svg('@app/icons/solid/circle-xmark.svg')|attr({ 'class': 'tw:shrink-0 tw:w-5 tw:h-5 tw:fill-red-500' }) }}
+                                </template>
+                                <span class="tw:shrink" x-html="dataUploadStatus.message"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            window.axios.defaults.headers.common['Accept'] = 'application/json';
+            window.axios.defaults.headers.common['Content-Type'] = 'application/json';
+            window.axios.defaults.headers.common['X-CSRF-Token'] = '{{ craft.app.request.getCsrfToken()}}';
+
+            Alpine.data('redirectsComponent', () => ({
+                connectionBusy: false,
+                connectionStatus: {
+                    'success': false,
+                    'message': '',
+                },
+                dataGeneratedDate: '{{ generatedKBDate }}',
+                dataGenerateBusy: false,
+                dataGenerateStatus: {
+                    'success': false,
+                    'message': '',
+                },
+                dataUploadedDate: '{{ uploadedKBDate }}',
+                dataUploadBusy: false,
+                dataUploadStatus: {
+                    'success': false,
+                    'message': '',
+                },
+                init() {
+                    let self = this;
+                    
+                    console.log('Redirect settings init');
+                },
+                verifyConnection: function() {
+                    let self = this;
+
+                    if (self.connectionBusy) return;
+
+                    self.connectionBusy = true;
+                    self.connectionStatus = {
+                        'success': false,
+                        'message': '',
+                    };
+
+                    axios.get('{{ cpUrl('redirector/ai/verify-connection') }}')
+                        .then(function(response) {
+                            let responseData = response.data;
+
+                            self.connectionStatus = responseData;
+                        })
+                        .catch(function(error) {
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('pxx-redirector') }}');
+                        })
+                        .finally(function() {
+                            self.connectionBusy = false;
+                        });
+                },
+                generateAiKnowledgeBase: function() {
+                    let self = this;
+
+                    if (self.dataGenerateBusy) return;
+
+                    self.dataGenerateBusy = true;
+                    self.dataGenerateStatus = {
+                        'success': false,
+                        'message': '',
+                    };
+
+                    axios.get('{{ cpUrl('redirector/ai/generate-knowledge-base') }}')
+                        .then(function(response) {
+                            let responseData = response.data;
+
+                            self.dataGenerateStatus = responseData;
+                            self.dataGeneratedDate = responseData.date;
+                        })
+                        .catch(function(error) {
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('pxx-redirector') }}');
+                        })
+                        .finally(function() {
+                            self.dataGenerateBusy = false;
+                        });
+                },
+                uploadAiKnowledgeBase: function() {
+                    let self = this;
+
+                    if (self.dataUploadBusy) return;
+
+                    self.dataUploadBusy = true;
+                    self.dataUploadStatus = {
+                        'success': false,
+                        'message': '',
+                    };
+
+                    axios.get('{{ cpUrl('redirector/ai/upload-knowledge-base') }}')
+                        .then(function(response) {
+                            let responseData = response.data;
+
+                            self.dataUploadStatus = responseData;
+                            self.dataUploadedDate = responseData.date;
+                        })
+                        .catch(function(error) {
+                            Craft.cp.displayError('{{ 'An error has occured!'|t('pxx-redirector') }}');
+                        })
+                        .finally(function() {
+                            self.dataUploadBusy = false;
+                        });
+                },
+            }));
+        });
+    </script>
 {% endblock %}

@@ -114,6 +114,11 @@ class Redirector extends Plugin
                 // redirects entry (DO NOT CHANGE ORDER)
                 $event->rules['redirector/redirects/save-redirect'] = [ 'route' => 'pxx-redirector/cp/redirects/save-redirect'];
                 $event->rules['redirector/redirects/<uid:.+>'] = [ 'route' => 'pxx-redirector/cp/redirects/entry'];
+                // ai
+                $event->rules['redirector/ai/verify-connection'] = [ 'route' => 'pxx-redirector/cp/ai/verify-connection'];
+                $event->rules['redirector/ai/get-suggestions'] = [ 'route' => 'pxx-redirector/cp/ai/get-suggestions'];
+                $event->rules['redirector/ai/generate-knowledge-base'] = [ 'route' => 'pxx-redirector/cp/ai/generate-knowledge-base'];
+                $event->rules['redirector/ai/upload-knowledge-base'] = [ 'route' => 'pxx-redirector/cp/ai/upload-knowledge-base'];
                 // settings
                 $event->rules['redirector/settings'] = [ 'route' => 'pxx-redirector/cp/settings/index'];
             }
