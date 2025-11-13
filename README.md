@@ -60,6 +60,15 @@ You can:
 
 Redirector automatically ensures that every moved, renamed, or deprecated entry maintains its SEO integrity, keeping your site structure clean and your rankings protected.
 
+### AI-powered suggestions
+Redirector also offers optional AI-based assistance that helps automatically identify the most relevant redirect destinations. When enabled, the system can suggest the correct URL based on your site’s content (see the Settings section for instructions on how to generate this data), making it easier to manage complex redirects or large websites with many pages.
+
+The AI suggestions are powered by OpenAI using its `gpt-5-nano` model in conjunction with the `file_search` tool, which retrieves suggestions from the custom knowledge base stored in a vector store.
+
+Pricing info:
+- `gpt-5-nano` model ( https://platform.openai.com/docs/pricing#text-tokens )
+- `file_search` tool ( https://platform.openai.com/docs/pricing#built-in-tools )
+
 ## Requirements
 
 This plugin requires:
