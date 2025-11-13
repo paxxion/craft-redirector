@@ -1,5 +1,10 @@
 # Release Notes for Redirector
 
+## 1.0.5 - 2025-11-13
+
+### Added
+- AI-powered suggestions using OpenAI gpt-5-nano model (API key must be provided)
+
 ## 1.0.4 - 2025-11-06
 
 ### Fixed

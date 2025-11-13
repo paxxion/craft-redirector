@@ -12,6 +12,7 @@ use DateTimeZone;
 use paxxion\craftredirector\assets\RedirectorAssets;
 use paxxion\craftredirector\records\NotFoundRecord;
 use paxxion\craftredirector\records\RedirectRecord;
+use paxxion\craftredirector\Redirector;
 use yii\base\DynamicModel;
 use yii\data\Pagination;
 use yii\web\Response;
@@ -479,11 +480,16 @@ class RedirectsController extends Controller
             $errors[$key] = '';
         }
 
+        $plugin = Redirector::getInstance();
+        $settings = $plugin->getSettings();
+        $apiKey = $settings->getOpenAiApiKey();
+
         return $this->renderTemplate('pxx-redirector/cp/redirects/entry', [
             'isNew' => $uid == 'new',
             'sites' => $returnSites,
             'data' => $redirectData,
             'errors' => $errors,
+            'enableAi' => $apiKey !== '',
         ]);
     }
 

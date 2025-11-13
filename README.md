@@ -60,6 +60,15 @@ You can:
 
 Redirector automatically ensures that every moved, renamed, or deprecated entry maintains its SEO integrity, keeping your site structure clean and your rankings protected.
 
+### AI-powered suggestions
+Redirector also offers optional AI-based assistance that helps automatically identify the most relevant redirect destinations. When enabled, the system can suggest the correct URL based on your site’s content (see the Settings section for instructions on how to generate this data), making it easier to manage complex redirects or large websites with many pages.
+
+The AI suggestions are powered by OpenAI using its `gpt-5-nano` model in conjunction with the `file_search` tool, which retrieves suggestions from the custom knowledge base stored in a vector store.
+
+Pricing info:
+- `gpt-5-nano` model ( https://platform.openai.com/docs/pricing#text-tokens )
+- `file_search` tool ( https://platform.openai.com/docs/pricing#built-in-tools )
+
 ## Requirements
 
 This plugin requires:
@@ -119,6 +128,8 @@ The redirects can also be imported from CSV (comma or semicolon separated).
 
 ## Settings
 
+### Audit
+
 #### Excluded 404
 
 These are exact match paths that will be excluded from being logged into the Audit section.
@@ -126,6 +137,54 @@ These are exact match paths that will be excluded from being logged into the Aud
 #### Excluded 404 Patterns
 
 These are regex match paths that will be excluded from being logged into the Audit section.
+
+### Redirects
+
+#### OpenAI API Key
+
+An OpenAI API key can be configured to enable AI integration within the Redirects creation page (**AI** button on **Redirect To** field).  
+AI suggestions require a support knowledge base file that will be uploaded to the OpenAI servers.
+
+To generate this file, create a **pxx-redirector.php** file inside the **config** folder.  
+This file must return, for each website entry/page, the following information:
+- **Site**: The site handle of the entry/page
+- **Language**: The language of the entry/page
+- **Title**: The title of the entry/page
+- **Description**: A short description about the content of the entry/page
+- **Url**: The url of the entry/page
+
+**Example of pxx-redirector.php file**:
+```
+<?php
+
+use craft\elements\Entry;
+
+$rows = [];
+
+$sites = Craft::$app->sites->getAllSites();
+foreach ($sites as $site) {
+    $entries = Entry::find()->siteId($site->id)->all();
+    foreach ($entries as $entry) {
+        $url = $entry->getUrl();
+
+        if ($url) {
+            $rows[] = [
+                'site' => $site->handle,
+                'language' => $site->language,
+                'title' => $entry->title,
+                'description' => $entry->subtitle ?? '',
+                'url' => $url,
+            ];
+        }
+    }
+}
+
+return $rows;
+```
+The file must return an array of pages, where each element includes the keys: `site`, `language`, `title`, `description`, and `url`.  
+Any entries or pages that should not be suggested by the AI must be excluded from this result set.
+
+### UI elements
 
 #### Url History UI Element
 
