@@ -145,7 +145,11 @@ These are regex match paths that will be excluded from being logged into the Aud
 An OpenAI API key can be configured to enable AI integration within the Redirects creation page (**AI** button on **Redirect To** field).  
 AI suggestions require a support knowledge base file that will be uploaded to the OpenAI servers.
 
-To generate this file, create a **pxx-redirector.php** file inside the **config** folder.  
+After configuring the OpenAI API key, two buttons will appear in the settings:  
+**Generate data**: used to create the knowledge base data  
+**Upload data**: used to upload the data on OpenAI servers  
+
+To generate the knowledge base, create a **pxx-redirector.php** file inside the **config** folder.  
 This file must return, for each website entry/page, the following information:
 - **Site**: The site handle of the entry/page
 - **Language**: The language of the entry/page
