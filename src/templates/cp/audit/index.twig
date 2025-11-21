@@ -178,7 +178,7 @@
             {# content #}
             <div class="tw:overflow-x-auto">
                 {# table #}
-                <table x-cloak x-show="!initializing" class="data tw:w-5xl tw:lg:w-full">
+                <table x-cloak x-show="!initializing" class="data tw:text-xs tw:font-medium tw:w-5xl tw:lg:w-full">
                     <thead class="">
                         <th class="checkbox-cell">
                             <button @click="toggleSelectionAllDataRows()">
@@ -278,19 +278,19 @@
                                             <a class="tw:hover:opacity-75 tw:transition-opacity" :href="dataRow.siteBaseUrl + dataRow.url" target="_blank">
                                                 {{ svg('@app/icons/solid/arrow-up-right-from-square.svg')|attr({ 'class': 'tw:w-3.5 tw:h-3.5 tw:fill-blue-500' }) }}
                                             </a>
-                                            <div class="tw:text-wrap tw:leading-none" x-text="dataRow.url"></div>
+                                            <div class="tw:leading-none tw:break-all" x-text="dataRow.url"></div>
                                         </div>
                                     </td>
                                     <td class="tw:max-2xl:hidden">
                                         <template x-if="!dataRow.lastReferrer">
-                                            <div class="tw:text-wrap tw:leading-none">-</div>
+                                            <div class="tw:leading-none tw:break-all">-</div>
                                         </template>
                                         <template x-if="dataRow.lastReferrer">
                                             <div class="tw:flex tw:items-start tw:gap-x-2">
                                                 <a class="tw:hover:opacity-75 tw:transition-opacity" :href="dataRow.lastReferrer" target="_blank">
                                                     {{ svg('@app/icons/solid/arrow-up-right-from-square.svg')|attr({ 'class': 'tw:w-3.5 tw:h-3.5 tw:fill-blue-500' }) }}
                                                 </a>
-                                                <div class="tw:text-wrap tw:leading-none" x-text="dataRow.lastReferrer"></div>
+                                                <div class="tw:leading-none tw:break-all" x-text="dataRow.lastReferrer"></div>
                                             </div>
                                         </template>
                                     </td>
@@ -298,7 +298,7 @@
                                         <div x-text="dataRow.totalHits"></div>
                                     </td>
                                     <td>
-                                        <div x-text="dataRow.dateLastHit"></div>
+                                        <div x-text="dataRow.dateLastHit" class="tw:whitespace-nowrap tw:keep-all"></div>
                                     </td>
                                     <td class="tw:w-32">
                                         <template x-if="dataRow.handled">

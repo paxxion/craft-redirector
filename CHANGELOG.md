@@ -1,5 +1,11 @@
 # Release Notes for Redirector
 
+## 1.0.6 - 2025-11-21
+
+### Fixed
+- Fixed UI
+- Fixed last referrer logic
+
 ## 1.0.5 - 2025-11-13
 
 ### Added

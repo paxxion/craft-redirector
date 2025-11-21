@@ -45,6 +45,11 @@ class RedirectService extends Component
             $currentSiteBaseUrl = trim($currentSite->getBaseUrl(), '/');
             $currentSitePath = parse_url($currentSiteBaseUrl, PHP_URL_PATH);
             
+            $referrer = $request->getReferrer();
+            if ($referrer && str_contains($referrer, '/admin/redirector/')) {
+                $referrer = null;
+            }
+            
             $absoluteUrl = $request->getAbsoluteUrl();            
             $requestedUrlData = [
                 'absoluteUrl' => $absoluteUrl,
@@ -52,7 +57,7 @@ class RedirectService extends Component
                 'host' => parse_url($absoluteUrl, PHP_URL_HOST),
                 'path' => '/' . trim(parse_url($absoluteUrl, PHP_URL_PATH), '/'),
                 'query' => parse_url($absoluteUrl, PHP_URL_QUERY),
-                'referrer' => $request->getReferrer(),
+                'referrer' => $referrer,
             ];
 
             // not found row
@@ -190,11 +195,14 @@ class RedirectService extends Component
             if (is_null($notFoundRow)) {
                 $notFoundRow = new NotFoundRecord();
                 $notFoundRow->siteId = $currentSite['id'];
+                $notFoundRow->lastReferrer = '';
                 $notFoundRow->url = $requestedUrlData['path'];
             }
             
             $notFoundRow->handled = false;
-            $notFoundRow->lastReferrer = $requestedUrlData['referrer'];
+            if ($requestedUrlData['referrer']) {
+                $notFoundRow->lastReferrer = $requestedUrlData['referrer'];
+            }
             $notFoundRow->totalHits += 1;
             $notFoundRow->dateLastHit = Carbon::now();
             $notFoundRow->save();

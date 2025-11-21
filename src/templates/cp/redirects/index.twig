@@ -249,7 +249,7 @@
             {# content #}
             <div class="tw:overflow-x-auto">
                 {# table #}
-                <table x-cloak x-show="!initializing" class="data tw:w-[1480px] tw:2xl:w-full">
+                <table x-cloak x-show="!initializing" class="data tw:text-xs tw:font-medium tw:w-[1480px] tw:2xl:w-full">
                     <thead class="">
                         <th class="checkbox-cell">
                             <button @click="toggleSelectionAllDataRows()">
@@ -378,11 +378,11 @@
                                     <td>
                                         <div class="tw:flex tw:items-center tw:gap-x-2">
                                             <div class="status tw:m-0!" :class="{ 'live': dataRow.enabled, 'disabled': !dataRow.enabled }"></div>
-                                            <div x-text="dataRow.oldUrl"></div>
+                                            <div class="tw:leading-none tw:break-all" x-text="dataRow.oldUrl"></div>
                                         </div>
                                     </td>                                 
                                     <td>
-                                        <div x-text="dataRow.newUrl"></div>
+                                        <div x-text="dataRow.newUrl" class="tw:leading-none tw:break-all"></div>
                                     </td>
                                     <td>
                                         <div x-text="dataRow.siteName"></div>
@@ -400,7 +400,7 @@
                                         <div x-text="dataRow.totalHits"></div>
                                     </td>
                                     <td>
-                                        <div x-text="dataRow.dateLastHit"></div>
+                                        <div x-text="dataRow.dateLastHit" class="tw:whitespace-nowrap tw:keep-all"></div>
                                     </td>
                                     <td class="tw:w-24">
                                         <div class="tw:flex tw:justify-center tw:items-center tw:gap-x-4">
