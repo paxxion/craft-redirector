@@ -13,7 +13,7 @@
   "require": {
     "php": ">=8.2",
     "craftcms/cms": "^5.8.0",
-    "nesbot/carbon": "^3.10",
+    "nesbot/carbon": "^2.67 || ^3.10",
     "openai-php/client": "^0.18.0"
   },
   "autoload": {

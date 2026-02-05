@@ -1,5 +1,10 @@
 # Release Notes for Redirector
 
+## 1.0.7 - 2026-02-05
+
+### Fixed
+- Fix composer.json
+
 ## 1.0.6 - 2025-11-21
 
 ### Fixed
